@@ -1,0 +1,26 @@
+import { z } from "zod";
+import { branded, BrandedType } from "@xndrjs/branded";
+
+export const {{pascalName}}Schema = z.object({
+  // Type discriminant for this shape. Remove it at your risk.
+  kind: z.literal("{{pascalName}}").default("{{pascalName}}"),
+  // TODO add shape properties
+  // payload: z.string().min(1),
+});
+
+const [{{pascalName}}Shape, patch{{pascalName}}] = branded.shape(
+  "{{pascalName}}",
+  {{pascalName}}Schema,
+  {
+    methods: {
+      // use `this` to refer to the current {{pascalName}} instance:
+      // getPayloadLength() {
+      //   return this.payload.length;
+      // },
+    },
+  }
+);
+
+export type {{pascalName}} = BrandedType<typeof {{pascalName}}Shape>;
+
+export { {{pascalName}}Shape };

@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+  - "configs/*"
+  - "composition/*"
+  - "features/*/*"
+  - "features/*/composition/*"
+  - "features/*/infrastructure/*"

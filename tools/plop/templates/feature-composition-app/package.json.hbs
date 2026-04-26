@@ -1,0 +1,22 @@
+{
+  "name": "@features/{{featureKebab}}-composition-{{compositionAppKebab}}",
+  "version": "1.0.0",
+  "description": "Composition root ({{compositionAppKebab}}) for feature {{pascalFeature}}",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./types": "./types.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@features/{{featureKebab}}-core": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "{{workspaceDependencyVersion "vitest"}}"
+  }
+}

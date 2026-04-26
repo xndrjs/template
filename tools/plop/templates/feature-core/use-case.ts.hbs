@@ -1,0 +1,17 @@
+/**
+ * Application use case — bind with `create{{pascalUseCaseName}}UseCase(deps)` from the feature composition package.
+ * Use cases must not import each other.
+ */
+import { createUseCase } from "@xndrjs/orchestration";
+
+export interface {{pascalUseCaseName}}UseCaseDeps {
+  // e.g. ports from `../ports/...`
+};
+
+export const create{{pascalUseCaseName}}UseCase = createUseCase(
+  (_deps: {{pascalUseCaseName}}UseCaseDeps) => {
+    return async function execute() {
+      throw new Error(`Not implemented: {{pascalUseCaseName}} use case`);
+    };
+  }
+);

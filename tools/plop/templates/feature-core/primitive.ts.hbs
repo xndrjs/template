@@ -1,0 +1,9 @@
+import { z } from "zod";
+import { branded, BrandedType } from "@xndrjs/branded";
+
+// TODO: tighten schema (bounds, formats, …) for your domain
+const {{pascalName}}Schema = {{{primitiveSchemaExpr}}};
+
+export const {{pascalName}} = branded.primitive("{{pascalName}}", {{pascalName}}Schema);
+
+export type {{pascalName}} = BrandedType<typeof {{pascalName}}>;

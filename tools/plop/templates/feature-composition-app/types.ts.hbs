@@ -1,0 +1,4 @@
+export interface RequestContext {
+  /** Composition-local request metadata; map it to `HttpContext` or SDK-specific options in `index.ts` (infrastructure provider). */
+  getCorrelationId?: () => string;
+}

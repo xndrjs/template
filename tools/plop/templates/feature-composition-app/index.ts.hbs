@@ -1,0 +1,56 @@
+import type { RequestContext } from "./types.js";
+
+/**
+ * Wires driven adapters and exposes request-scoped dependency slices for **use cases**.
+ * Infrastructure and wired use-case factories live in this entry for now (per-feature scope).
+ *
+ * **App-scoped dependencies** (one instance for the whole process / app lifetime):
+ * - Hold them as ordinary private fields on the provider class below, or
+ * - Lazily construct them with a private backing field and a getter that uses nullish
+ *   coalescing assignment, e.g. `private _client: Foo | null = null` and
+ *   `private get client() { return (this._client ??= new FooAdapter(...)); }`
+ *
+ * **Request-scoped dependencies** (must vary per HTTP request / correlation / tenant):
+ * - Do not cache them on `this` as long-lived singletons. Instead, add methods that take
+ *   `RequestContext` and return a fresh or context-bound instance, e.g.
+ *   `getHttpClient(ctx: RequestContext)`, `getLoaders(ctx)`, or
+ *   `getTicketRepository(ctx: RequestContext) { return new SqlTicketRepository(...); }`
+ *
+ * **`getForContext(ctx)`** should assemble the object your **use-case factories** (`createXxxUseCase`) need by combining
+ * app-scoped ports (from your private getters / fields) with request-scoped ones (by calling
+ * those `get…(ctx)` methods with the same `ctx`). Return one object (or a typed interface) whose
+ * properties match the **deps interfaces** of your use cases (normal ports only; interactive ports
+ * are passed to `execute(...)` from the caller, not listed here).
+ */
+class {{pascalProvider}}InfrastructureProvider {
+  getForContext(_ctx: RequestContext) {
+    return {
+
+    };
+  }
+}
+
+const infrastructureProvider = new {{pascalProvider}}InfrastructureProvider();
+
+/**
+ * Wired use cases for this feature composition app. Add **factories** (or getters) here that return
+ * `createXyzUseCase({ … })(…)` (from `@xndrjs/orchestration`), pulling deps from
+ * `infrastructureProvider.getForContext(ctx)` (only normal ports belong on those deps objects).
+ *
+ * **Interactive use cases:** same `createUseCase` shape in core/orchestration; callers pass `…InteractionPort`
+ * into the inner `execute` at call sites — do not put interaction ports on the deps object.
+ *
+ * Example shape:
+ *   export function get{{pascalProvider}}Root(ctx: RequestContext) {
+ *     const infrastructure = infrastructureProvider.getForContext(ctx);
+ *     return {
+ *       recordLineItem: createRecordLineItemUseCase({ ... }),
+ *     };
+ *   }
+ */
+export function get{{pascalProvider}}Root(ctx: RequestContext) {
+  const _infrastructure = infrastructureProvider.getForContext(ctx);
+  return {
+
+  };
+}
