@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 import nodePlop from "node-plop";
 import { applyCommonPlopSetup } from "../plop/plop-register-common.ts";
 import { registerPlopGenerators } from "../plop/plopfile.ts";
+import { compositionPackageName } from "../plop/lib/package-naming.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "..", "..");
@@ -28,6 +29,7 @@ const DEMO_CORE_REL = "features/demo/core";
 const DEMO_COMPOSITION_WEB_REL = "features/demo/composition/web";
 const DEMO_DRIVEN_DEMO_REL = "features/demo/infrastructure/driven-demo";
 const DEMO_WEB_REL = "apps/demo-web";
+const DEMO_COMPOSITION_PKG = compositionPackageName("demo", "web");
 const demoFeatureDir = path.join(repoRoot, "features", "demo");
 const demoWebDir = path.join(repoRoot, "apps", "demo-web");
 
@@ -39,7 +41,7 @@ function ensureDemoWebApp(): void {
       "{",
       '  "name": "demo-web",',
       '  "version": "1.0.0",',
-      '  "description": "App wired to @features/demo-composition-web (demo composition root)",',
+      `  "description": "App wired to ${DEMO_COMPOSITION_PKG} (demo composition root)",`,
       '  "private": true,',
       '  "type": "module",',
       '  "scripts": {',
@@ -47,7 +49,7 @@ function ensureDemoWebApp(): void {
       '    "lint:fix": "eslint . --fix"',
       "  },",
       '  "dependencies": {',
-      '    "@features/demo-composition-web": "workspace:*"',
+      `    "${DEMO_COMPOSITION_PKG}": "workspace:*"`,
       "  }",
       "}",
       "",
@@ -71,7 +73,7 @@ function ensureDemoWebApp(): void {
   fs.writeFileSync(
     path.join(demoWebDir, "index.ts"),
     [
-      'import { getDemoWebRoot } from "@features/demo-composition-web";',
+      `import { getDemoWebRoot } from "${DEMO_COMPOSITION_PKG}";`,
       "",
       "const root = getDemoWebRoot({});",
       "await root.verifyUser();",

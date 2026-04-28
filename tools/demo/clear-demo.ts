@@ -1,6 +1,5 @@
 /**
  * Removes demo scaffold: `features/demo/` and the smoke-test app `apps/demo-web/`
- * (depends on `@features/demo-composition-web` from that tree).
  *
  * Usage (from repo root):
  *   pnpm demo:clear

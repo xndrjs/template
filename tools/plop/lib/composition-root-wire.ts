@@ -1,7 +1,7 @@
 import { toCamelCase, toPascalCase } from "./casing.ts";
 
 export interface CompositionUseCaseWire {
-  /** e.g. `@features/demo-core` */
+  /** e.g. `@core/demo` */
   corePkgName: string;
   /** kebab stem: `verify-user` from `verify-user.use-case.ts` */
   kebabStem: string;

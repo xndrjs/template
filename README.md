@@ -18,7 +18,8 @@ In short:
 ## What is in this repo (current state)
 
 - **pnpm workspace** in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml): `apps/*`, `configs/*`, `composition/*`, packages under `features/*/*`, `features/*/composition/*`, `features/*/infrastructure/*`.
-- **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@features/...` naming).
+- **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@<slug>/core`, `@<slug>/composition-*`, `@<slug/driven-*`).
+- **Package naming config**: scope/pattern names for generated packages are centralized in [`tools/plop/lib/package-naming.ts`](./tools/plop/lib/package-naming.ts) (`PACKAGE_SCOPES` + naming helpers), so you can customize conventions in one place.
 - **Flat package roots**: no required `src/` folder; sources and barrels live at the package root (`index.ts`, slices in subfolders).
 - **Shared configs** in `configs/`: TypeScript (`@features/config-typescript`), ESLint (`@features/config-eslint`), Vitest (`@features/config-vitest`).
 - **Tooling** in `tools/`: a single Plop setup ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)), scaffold demo ([`tools/demo/run-demo.ts`](./tools/demo/run-demo.ts)).
@@ -32,11 +33,11 @@ The root package is named `hexagonal-template` in [`package.json`](./package.jso
 
 A typical feature follows this shape (all generatable with Plop):
 
-| Path                                             | Example package                         | Role                                                                                                                                                                                                                                                                       |
-| ------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `features/<kebab>/core/`                         | `@features/<kebab>-core`                | **Domain** split in `domain/models` (primitives, shapes, proofs) and `domain/operations` (capabilities, services), plus **orchestration** (`orchestration/use-cases`, `orchestration/ports`, and other orchestration files classified as `orchestration-other` in ESLint). |
-| `features/<kebab>/composition/<app>/`            | `@features/<kebab>-composition-<app>`   | Wiring for a surface (HTTP, CLI, jobs): assembles dependencies and use cases; depends on core.                                                                                                                                                                             |
-| `features/<kebab>/infrastructure/driven-<name>/` | `@features/<kebab>-infra-driven-<name>` | Outbound adapters (persistence, external APIs, etc.): flat `.ts` files at the package root, re-exported from `index.ts`.                                                                                                                                                   |
+| Path                                             | Example package              | Role                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `features/<kebab>/core/`                         | `@<kebab>/core`              | **Domain** split in `domain/models` (primitives, shapes, proofs) and `domain/operations` (capabilities, services), plus **orchestration** (`orchestration/use-cases`, `orchestration/ports`, and other orchestration files classified as `orchestration-other` in ESLint). |
+| `features/<kebab>/composition/<app>/`            | `@<kebab>/composition-<app>` | Wiring for a surface (HTTP, CLI, jobs): assembles dependencies and use cases; depends on core.                                                                                                                                                                             |
+| `features/<kebab>/infrastructure/driven-<name>/` | `@<kebab>/driven-<name>`     | Outbound adapters (persistence, external APIs, etc.): flat `.ts` files at the package root, re-exported from `index.ts`.                                                                                                                                                   |
 
 **Cross-package imports** must use workspace package names and each package’s `exports`—not raw paths like `features/...` (blocked by `no-restricted-imports`).
 
@@ -107,17 +108,17 @@ There is **no** dedicated `mappers` orchestration slice: mapping stays where it 
 
 Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (casing, core package discovery, workspace dependency versions).
 
-| Generator                               | What it creates                                                                                                                                                                            |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `feature-core`                          | `features/<kebab>/core/` — `@features/<kebab>-core`, domain split entry points (`models`, `operations`), orchestration (`use-cases`, `ports`), root `index.ts` and `package.json` exports. |
-| `feature-composition-app`               | `features/<kebab>/composition/<app>/` — composition package wired to core.                                                                                                                 |
-| `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add `@xndrjs/data-layer` and/or `@xndrjs/tasks` (both selected by default).                            |
-| `feature-core-branded-primitive`        | Zod + `@xndrjs/branded` primitive in `domain/models/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                            |
-| `feature-core-branded-shape`            | Branded shape in `domain/models/shapes/<kebab>.shape.ts`.                                                                                                                                  |
-| `feature-core-proof`                    | Schema-first proof under `domain/models/proofs/<kebab>.proof.ts` using `branded.proof(brand, schema)`.                                                                                     |
-| `feature-core-capability`               | Reusable capability under `domain/operations/capabilities/<kebab>.capability.ts` using `branded.capabilities<...>().methods(...)`.                                                         |
-| `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                                     |
-| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                             |
+| Generator                               | What it creates                                                                                                                                                                   |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `feature-core`                          | `features/<kebab>/core/` — `@core/<kebab>`, domain split entry points (`models`, `operations`), orchestration (`use-cases`, `ports`), root `index.ts` and `package.json` exports. |
+| `feature-composition-app`               | `features/<kebab>/composition/<app>/` — composition package wired to core.                                                                                                        |
+| `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add `@xndrjs/data-layer` and/or `@xndrjs/tasks` (both selected by default).                   |
+| `feature-core-branded-primitive`        | Zod + `@xndrjs/branded` primitive in `domain/models/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                   |
+| `feature-core-branded-shape`            | Branded shape in `domain/models/shapes/<kebab>.shape.ts`.                                                                                                                         |
+| `feature-core-proof`                    | Schema-first proof under `domain/models/proofs/<kebab>.proof.ts` using `branded.proof(brand, schema)`.                                                                            |
+| `feature-core-capability`               | Reusable capability under `domain/operations/capabilities/<kebab>.capability.ts` using `branded.capabilities<...>().methods(...)`.                                                |
+| `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                            |
+| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                    |
 
 ---
 

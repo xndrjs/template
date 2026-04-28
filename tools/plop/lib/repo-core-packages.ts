@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
-
-const CORE_PKG_NAME = new RegExp("^@features/.+-core$");
+import { CORE_PACKAGE_NAME_RE } from "./package-naming.ts";
 
 function toPosixRel(repoRoot: string, absPath: string) {
   return path.relative(repoRoot, absPath).split(path.sep).join("/");
 }
 
 /**
- * Packages named `@features/…-core` under `features/{feature}/core/`.
+ * Packages named `@core/<feature>` under `features/{feature}/core/`.
  */
 export function getRepoCorePackageChoices(
   repoRoot: string
@@ -36,7 +35,7 @@ export function getRepoCorePackageChoices(
     } catch {
       continue;
     }
-    if (!CORE_PKG_NAME.test(pkgName)) continue;
+    if (!CORE_PACKAGE_NAME_RE.test(pkgName)) continue;
     const pkgRoot = path.dirname(pkgJsonPath);
     const rel = toPosixRel(repoRoot, pkgRoot);
     out.push({

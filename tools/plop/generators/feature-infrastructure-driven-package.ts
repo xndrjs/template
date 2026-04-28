@@ -5,6 +5,10 @@ import { featureSegmentFromCorePackageRel } from "../lib/repo-core-paths.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
 import { toKebabCase } from "../lib/casing.ts";
+import {
+  corePackageName,
+  infrastructureDrivenPackageName,
+} from "../lib/package-naming.ts";
 const repoRoot = getRepoRoot();
 
 const XNDR_INFRA_DRIVEN_PACKAGE_CHOICES = [
@@ -33,17 +37,17 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
 ) {
   plop.setGenerator("feature-infrastructure-driven-package", {
     description:
-      "Create @features/…-infra-driven-… under features/<feature>/infrastructure/driven-<name>/ (flat TypeScript modules at package root, re-exported from index.ts).",
+      "Create driven- infrastructure package under features/<feature>/infrastructure/driven-<name>/ (flat TypeScript modules at package root, re-exported from index.ts).",
     prompts: [
       {
         type: "list",
         name: "corePackageRel",
-        message: "Select @features/*-core (determines features/<slug>/):",
+        message: "Select core package (determines features/<slug>/):",
         choices: () => {
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-core packages found. Run generator "feature-core" for your feature first.'
+              'No core packages found. Run generator "feature-core" for your feature first.'
             );
           }
           return c;
@@ -97,6 +101,11 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
       }
 
       const featureKebab = featureSegmentFromCorePackageRel(coreRel);
+      const corePkgName = corePackageName(featureKebab);
+      const infrastructurePkgName = infrastructureDrivenPackageName(
+        featureKebab,
+        drivenKebab
+      );
 
       const packageRel = `features/${featureKebab}/infrastructure/driven-${drivenKebab}`;
       const packageRootAbs = path.join(repoRoot, ...packageRel.split("/"));
@@ -118,6 +127,8 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
       const templateData = {
         featureKebab,
         drivenKebab,
+        corePackageName: corePkgName,
+        infrastructurePackageName: infrastructurePkgName,
         hasOptionalXndrDeps,
         includeDataLayer,
         includeTasks,

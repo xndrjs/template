@@ -25,7 +25,7 @@ export default function registerCompositionWireUseCasesGenerator(
           const c = getRepoCompositionPackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-composition-* packages found. Run "feature-composition-app" first.'
+              'No composition packages found. Run "feature-composition-app" first.'
             );
           }
           return c;
@@ -39,7 +39,7 @@ export default function registerCompositionWireUseCasesGenerator(
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-core packages found. Run "feature-core" (or scaffold demo) first.'
+              'No core packages found. Run "feature-core" (or scaffold demo) first.'
             );
           }
           return c;

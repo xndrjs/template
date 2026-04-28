@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
-
-const COMPOSITION_PKG_NAME = new RegExp("^@features/.+-composition-.+$");
+import { COMPOSITION_PACKAGE_NAME_RE } from "./package-naming.ts";
 
 function toPosixRel(repoRoot: string, absPath: string) {
   return path.relative(repoRoot, absPath).split(path.sep).join("/");
 }
 
 /**
- * Packages named `@features/…-composition-…` under `features/{feature}/composition/{app}/`.
+ * Packages under `features/{feature}/composition/{app}/`.
  */
 export function getRepoCompositionPackageChoices(
   repoRoot: string
@@ -47,7 +46,7 @@ export function getRepoCompositionPackageChoices(
       } catch {
         continue;
       }
-      if (!COMPOSITION_PKG_NAME.test(pkgName)) continue;
+      if (!COMPOSITION_PACKAGE_NAME_RE.test(pkgName)) continue;
       const pkgRoot = path.dirname(pkgJsonPath);
       const rel = toPosixRel(repoRoot, pkgRoot);
       out.push({
