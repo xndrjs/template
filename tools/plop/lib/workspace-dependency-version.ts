@@ -4,10 +4,10 @@ import path from "node:path";
 const FALLBACK_DEPENDENCY_VERSIONS: Record<string, string> = {
   vitest: "^4.1.0",
   zod: "^4.3.6",
-  "@xndrjs/branded": "^0.1.0",
-  "@xndrjs/orchestration": "^0.1.0",
-  "@xndrjs/data-layer": "^0.1.0",
-  "@xndrjs/tasks": "^0.1.0",
+  "@xndrjs/branded": "^0.3.0-alpha.0",
+  "@xndrjs/orchestration": "^0.3.0-alpha.0",
+  "@xndrjs/data-layer": "^0.1.2-alpha.0",
+  "@xndrjs/tasks": "^0.1.2-alpha.0",
 };
 
 function parseSemverLike(spec: string | undefined | null) {

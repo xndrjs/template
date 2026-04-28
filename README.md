@@ -129,5 +129,5 @@ Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (ca
 ## Quick conventions
 
 - **File suffixes**: `.primitive.ts`, `.shape.ts`, `.primitive.refinement.ts`, `.shape.refinement.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
-- **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.1.0`), and `@xndrjs/orchestration` (`^0.1.0`) (use cases: `createUseCase` + anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.0`) via their generator.
+- **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.3.0-alpha.0`), and `@xndrjs/orchestration` (`^0.3.0-alpha.0`) (use cases: `createUseCase` + anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.2-alpha.0`) via their generator.
 - **Smoke test**: after `pnpm demo:scaffold`, inspect `features/demo/`; `pnpm demo:clear` removes it.
