@@ -1,7 +1,8 @@
 import type { ActionType, NodePlopAPI } from "node-plop";
 import {
   appendExportToBarrelIndex,
-  ensureDomainIndexReexportsDomainSlices,
+  ensureModelsIndexReexportsModelSlices,
+  ensureOperationsIndexReexportsOperationSlices,
 } from "../lib/domain-barrel.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
@@ -21,7 +22,7 @@ function stripTrailingServiceLabel(raw: string): string {
 export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
   plop.setGenerator("feature-core-service", {
     description:
-      "Add a domain service under core/domain/services/ (`<kebab>.service.ts`, default `<Name>Service` export); updates domain barrels.",
+      "Add a domain service under core/domain/operations/services/ (`<kebab>.service.ts`, default `<Name>Service` export); updates domain barrels.",
     prompts: [
       {
         type: "list",
@@ -41,7 +42,7 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
         type: "input",
         name: "serviceName",
         message:
-          "Service base name (e.g. PriceCalculator). File: domain/services/<kebab>.service.ts, function: <Name>Service:",
+          "Service base name (e.g. PriceCalculator). File: domain/operations/services/<kebab>.service.ts, function: <Name>Service:",
         validate: (value: unknown) => {
           const base = stripTrailingServiceLabel(String(value ?? ""));
           if (!base) return "Name cannot be empty";
@@ -66,29 +67,69 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
       }
 
       const exportLine = `export * from './${kebab}.service';`;
-      const domainIndex = `../../${coreRel}/domain/index.ts`;
-      const servicesIndex = `../../${coreRel}/domain/services/index.ts`;
-      const serviceFile = `../../${coreRel}/domain/services/${kebab}.service.ts`;
+      const operationsIndex = `../../${coreRel}/domain/operations/index.ts`;
+      const servicesIndex = `../../${coreRel}/domain/operations/services/index.ts`;
+      const serviceFile = `../../${coreRel}/domain/operations/services/${kebab}.service.ts`;
 
       return [
         {
           type: "add",
-          path: servicesIndex,
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "modify",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          transform: (file: string) =>
+            ensureModelsIndexReexportsModelSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: domainIndex,
-          templateFile: "templates/feature-core/domain-index.ts.hbs",
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/proofs/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: operationsIndex,
+          templateFile: "templates/feature-core/domain-operations-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "modify",
-          path: domainIndex,
+          path: operationsIndex,
           transform: (file: string) =>
-            ensureDomainIndexReexportsDomainSlices(file),
+            ensureOperationsIndexReexportsOperationSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/capabilities/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: servicesIndex,
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
         },
         {
           type: "add",

@@ -3,7 +3,7 @@ import path from "node:path";
 import type { ActionType, NodePlopAPI } from "node-plop";
 import {
   appendExportToBarrelIndex,
-  ensureDomainIndexReexportsDomainSlices,
+  ensureModelsIndexReexportsModelSlices,
 } from "../lib/domain-barrel.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
@@ -18,7 +18,7 @@ function domainAbs(repoRootArg: string, coreRel: string) {
 export default function registerFeatureCoreProofGenerator(plop: NodePlopAPI) {
   plop.setGenerator("feature-core-proof", {
     description:
-      "Scaffold schema-first `branded.proof(brand, schema)` under `domain/proofs/<kebab>.proof.ts` (TODO stubs).",
+      "Scaffold schema-first `branded.proof(brand, schema)` under `domain/models/proofs/<kebab>.proof.ts` (TODO stubs).",
     prompts: [
       {
         type: "list",
@@ -38,7 +38,7 @@ export default function registerFeatureCoreProofGenerator(plop: NodePlopAPI) {
         type: "input",
         name: "proofName",
         message:
-          "Proof name (e.g. VerifiedPlopDemoId). File: domain/proofs/<kebab>.proof.ts:",
+          "Proof name (e.g. VerifiedPlopDemoId). File: domain/models/proofs/<kebab>.proof.ts:",
         validate: (value: unknown) => {
           const raw = String(value ?? "").trim();
           if (!raw) return "Name cannot be empty";
@@ -64,12 +64,13 @@ export default function registerFeatureCoreProofGenerator(plop: NodePlopAPI) {
       const outFileName = `${proofKebab}.proof.ts`;
       const outAbs = path.join(
         domainAbs(repoRoot, coreRel),
+        "models",
         "proofs",
         outFileName
       );
       if (fs.existsSync(outAbs)) {
         throw new Error(
-          `Proof file already exists: domain/proofs/${outFileName}`
+          `Proof file already exists: domain/models/proofs/${outFileName}`
         );
       }
 
@@ -82,26 +83,66 @@ export default function registerFeatureCoreProofGenerator(plop: NodePlopAPI) {
       return [
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/proofs/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/proofs/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
-          type: "modify",
-          path: "../../{{corePackageRel}}/domain/index.ts",
-          transform: (file: string) =>
-            ensureDomainIndexReexportsDomainSlices(file),
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
         },
         {
           type: "add",
-          path: `../../${path.posix.join(...coreRel.split("/"), "domain", "proofs", outFileName)}`,
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "modify",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          transform: (file: string) =>
+            ensureModelsIndexReexportsModelSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/index.ts",
+          templateFile: "templates/feature-core/domain-operations-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/capabilities/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/services/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: `../../${path.posix.join(...coreRel.split("/"), "domain", "models", "proofs", outFileName)}`,
           templateFile: "templates/feature-core/proof.ts.hbs",
           data: templateData,
         },
         {
           type: "modify",
-          path: "../../{{corePackageRel}}/domain/proofs/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/proofs/index.ts",
           transform: (file: string) =>
             appendExportToBarrelIndex(file, exportLine),
         },

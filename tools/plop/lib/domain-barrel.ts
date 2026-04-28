@@ -18,25 +18,8 @@ const SHAPES_REEXPORT = 'export * from "./shapes";';
 const PROOFS_REEXPORT = 'export * from "./proofs";';
 const CAPABILITIES_REEXPORT = 'export * from "./capabilities";';
 const SERVICES_REEXPORT = 'export * from "./services";';
-
-/**
- * Ensure `domain/index.ts` re-exports domain slice barrels.
- * Strips legacy per-file exports and old `refinements/` barrel lines.
- */
-export function ensureDomainIndexReexportsDomainSlices(file: string): string {
-  const withoutLegacy = file
-    .split("\n")
-    .map((l) => l.trimEnd())
-    .filter((l) => {
-      const t = l.trim();
-      if (!t) return false;
-      if (/\.branded-(primitive|shape)['"]/.test(t)) return false;
-      if (/refinements\/index['"]/.test(t)) return false;
-      return true;
-    })
-    .join("\n");
-
-  let body = withoutLegacy.replace(/^export\s*{\s*}\s*;?\s*$/m, "").trimEnd();
+export function ensureModelsIndexReexportsModelSlices(file: string): string {
+  let body = file.replace(/^export\s*{\s*}\s*;?\s*$/m, "").trimEnd();
   if (!body.includes(PRIMITIVES_REEXPORT)) {
     body =
       body.length > 0 ? `${body}\n${PRIMITIVES_REEXPORT}` : PRIMITIVES_REEXPORT;
@@ -47,8 +30,18 @@ export function ensureDomainIndexReexportsDomainSlices(file: string): string {
   if (!body.includes(PROOFS_REEXPORT)) {
     body = `${body}\n${PROOFS_REEXPORT}`;
   }
+  return `${body}\n`;
+}
+
+export function ensureOperationsIndexReexportsOperationSlices(
+  file: string
+): string {
+  let body = file.replace(/^export\s*{\s*}\s*;?\s*$/m, "").trimEnd();
   if (!body.includes(CAPABILITIES_REEXPORT)) {
-    body = `${body}\n${CAPABILITIES_REEXPORT}`;
+    body =
+      body.length > 0
+        ? `${body}\n${CAPABILITIES_REEXPORT}`
+        : CAPABILITIES_REEXPORT;
   }
   if (!body.includes(SERVICES_REEXPORT)) {
     body = `${body}\n${SERVICES_REEXPORT}`;

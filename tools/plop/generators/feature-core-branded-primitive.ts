@@ -1,7 +1,7 @@
 import type { ActionType, NodePlopAPI } from "node-plop";
 import {
   appendExportToBarrelIndex,
-  ensureDomainIndexReexportsDomainSlices,
+  ensureModelsIndexReexportsModelSlices,
 } from "../lib/domain-barrel.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
@@ -38,7 +38,7 @@ export default function registerFeatureCoreBrandedPrimitiveGenerator(
 ) {
   plop.setGenerator("feature-core-branded-primitive", {
     description:
-      "Add a Zod + @xndrjs/branded primitive under core/domain/primitives/ (`<kebab>.primitive.ts`); choose scalar schema (string/number/boolean/date/uuid/bigint or custom `z.*`). See https://www.npmjs.com/package/@xndrjs/branded",
+      "Add a Zod + @xndrjs/branded primitive under core/domain/models/primitives/ (`<kebab>.primitive.ts`); choose scalar schema (string/number/boolean/date/uuid/bigint or custom `z.*`). See https://www.npmjs.com/package/@xndrjs/branded",
     prompts: [
       {
         type: "list",
@@ -58,7 +58,7 @@ export default function registerFeatureCoreBrandedPrimitiveGenerator(
         type: "input",
         name: "primitiveName",
         message:
-          "Branded primitive base name (e.g. CustomerId). File will be `domain/primitives/<kebab>.primitive.ts`:",
+          "Branded primitive base name (e.g. CustomerId). File will be `domain/models/primitives/<kebab>.primitive.ts`:",
         validate: (value: unknown) =>
           String(value ?? "").trim().length > 0 || "Name cannot be empty",
       },
@@ -113,33 +113,66 @@ export default function registerFeatureCoreBrandedPrimitiveGenerator(
       return [
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/primitives/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/shapes/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/proofs/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "modify",
-          path: "../../{{corePackageRel}}/domain/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
           transform: (file: string) =>
-            ensureDomainIndexReexportsDomainSlices(file),
+            ensureModelsIndexReexportsModelSlices(file),
         },
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/primitives/{{kebabCase primitiveName}}.primitive.ts",
+          path: "../../{{corePackageRel}}/domain/operations/index.ts",
+          templateFile: "templates/feature-core/domain-operations-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/services/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/capabilities/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/primitives/{{kebabCase primitiveName}}.primitive.ts",
           templateFile: "templates/feature-core/primitive.ts.hbs",
           data: { pascalName, primitiveSchemaExpr },
         },
         {
           type: "modify",
-          path: "../../{{corePackageRel}}/domain/primitives/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
           transform: (file: string) =>
             appendExportToBarrelIndex(file, exportLine),
         },

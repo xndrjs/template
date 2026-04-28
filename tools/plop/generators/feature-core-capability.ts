@@ -1,7 +1,8 @@
 import type { ActionType, NodePlopAPI } from "node-plop";
 import {
   appendExportToBarrelIndex,
-  ensureDomainIndexReexportsDomainSlices,
+  ensureModelsIndexReexportsModelSlices,
+  ensureOperationsIndexReexportsOperationSlices,
 } from "../lib/domain-barrel.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
@@ -23,7 +24,7 @@ export default function registerFeatureCoreCapabilityGenerator(
 ) {
   plop.setGenerator("feature-core-capability", {
     description:
-      "Add a domain capability under core/domain/capabilities/ (`<kebab>.capability.ts`, `<Name>Capability` export); updates domain barrels.",
+      "Add a domain capability under core/domain/operations/capabilities/ (`<kebab>.capability.ts`, `<Name>Capability` export); updates domain barrels.",
     prompts: [
       {
         type: "list",
@@ -43,7 +44,7 @@ export default function registerFeatureCoreCapabilityGenerator(
         type: "input",
         name: "capabilityName",
         message:
-          "Capability base name (e.g. UserRename). File: domain/capabilities/<kebab>.capability.ts, export: <Name>Capability:",
+          "Capability base name (e.g. UserRename). File: domain/operations/capabilities/<kebab>.capability.ts, export: <Name>Capability:",
         validate: (value: unknown) => {
           const base = stripTrailingCapabilityLabel(String(value ?? ""));
           if (!base) return "Name cannot be empty";
@@ -70,29 +71,69 @@ export default function registerFeatureCoreCapabilityGenerator(
       }
 
       const exportLine = `export * from './${kebab}.capability';`;
-      const domainIndex = `../../${coreRel}/domain/index.ts`;
-      const capabilitiesIndex = `../../${coreRel}/domain/capabilities/index.ts`;
-      const capabilityFile = `../../${coreRel}/domain/capabilities/${kebab}.capability.ts`;
+      const operationsIndex = `../../${coreRel}/domain/operations/index.ts`;
+      const capabilitiesIndex = `../../${coreRel}/domain/operations/capabilities/index.ts`;
+      const capabilityFile = `../../${coreRel}/domain/operations/capabilities/${kebab}.capability.ts`;
 
       return [
         {
           type: "add",
-          path: capabilitiesIndex,
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "modify",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          transform: (file: string) =>
+            ensureModelsIndexReexportsModelSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: domainIndex,
-          templateFile: "templates/feature-core/domain-index.ts.hbs",
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/proofs/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: operationsIndex,
+          templateFile: "templates/feature-core/domain-operations-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "modify",
-          path: domainIndex,
+          path: operationsIndex,
           transform: (file: string) =>
-            ensureDomainIndexReexportsDomainSlices(file),
+            ensureOperationsIndexReexportsOperationSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/services/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: capabilitiesIndex,
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
         },
         {
           type: "add",

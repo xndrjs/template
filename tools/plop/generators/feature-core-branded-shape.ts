@@ -1,7 +1,8 @@
 import type { ActionType, NodePlopAPI } from "node-plop";
 import {
   appendExportToBarrelIndex,
-  ensureDomainIndexReexportsDomainSlices,
+  ensureModelsIndexReexportsModelSlices,
+  ensureOperationsIndexReexportsOperationSlices,
 } from "../lib/domain-barrel.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
@@ -14,7 +15,7 @@ export default function registerFeatureCoreBrandedShapeGenerator(
 ) {
   plop.setGenerator("feature-core-branded-shape", {
     description:
-      "Add a Zod + @xndrjs/branded shape under core/domain/shapes/ (`<kebab>.shape.ts`); exports `const <Name>Shape = branded.shape(...)` — see https://www.npmjs.com/package/@xndrjs/branded",
+      "Add a Zod + @xndrjs/branded shape under core/domain/models/shapes/ (`<kebab>.shape.ts`); exports `const <Name>Shape = branded.shape(...)` — see https://www.npmjs.com/package/@xndrjs/branded",
     prompts: [
       {
         type: "list",
@@ -34,7 +35,7 @@ export default function registerFeatureCoreBrandedShapeGenerator(
         type: "input",
         name: "shapeName",
         message:
-          "Branded shape base name (e.g. AddressSnapshot). File will be `domain/shapes/<kebab>.shape.ts`:",
+          "Branded shape base name (e.g. AddressSnapshot). File will be `domain/models/shapes/<kebab>.shape.ts`:",
         validate: (value: unknown) =>
           String(value ?? "").trim().length > 0 || "Name cannot be empty",
       },
@@ -49,40 +50,72 @@ export default function registerFeatureCoreBrandedShapeGenerator(
       return [
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/primitives/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/shapes/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/capabilities/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/proofs/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "modify",
-          path: "../../{{corePackageRel}}/domain/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
           transform: (file: string) =>
-            ensureDomainIndexReexportsDomainSlices(file),
+            ensureModelsIndexReexportsModelSlices(file),
         },
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/shapes/{{kebabCase shapeName}}.shape.ts",
+          path: "../../{{corePackageRel}}/domain/operations/index.ts",
+          templateFile: "templates/feature-core/domain-operations-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "modify",
+          path: "../../{{corePackageRel}}/domain/operations/index.ts",
+          transform: (file: string) =>
+            ensureOperationsIndexReexportsOperationSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/services/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/capabilities/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/models/shapes/{{kebabCase shapeName}}.shape.ts",
           templateFile: "templates/feature-core/shape.ts.hbs",
           data: { pascalName },
         },
         {
           type: "modify",
-          path: "../../{{corePackageRel}}/domain/shapes/index.ts",
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
           transform: (file: string) =>
             appendExportToBarrelIndex(file, exportLine),
         },

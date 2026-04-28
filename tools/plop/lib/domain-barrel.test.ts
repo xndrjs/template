@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   appendExportToBarrelIndex,
-  ensureDomainIndexReexportsDomainSlices,
+  ensureModelsIndexReexportsModelSlices,
+  ensureOperationsIndexReexportsOperationSlices,
 } from "./domain-barrel.ts";
 
 describe("domain-barrel", () => {
@@ -13,15 +14,16 @@ describe("domain-barrel", () => {
     ).toBe(`export * from './bar.primitive';\n${line}\n`);
   });
 
-  it("ensureDomainIndexReexportsDomainSlices strips legacy and refinements barrel", () => {
-    const legacy = `export * from './x.branded-primitive';\nexport * from "./refinements";\n`;
-    const out = ensureDomainIndexReexportsDomainSlices(legacy);
+  it("ensureModelsIndexReexportsModelSlices ensures models slices", () => {
+    const out = ensureModelsIndexReexportsModelSlices("export {}\n");
     expect(out).toContain('export * from "./primitives";');
     expect(out).toContain('export * from "./shapes";');
     expect(out).toContain('export * from "./proofs";');
+  });
+
+  it("ensureOperationsIndexReexportsOperationSlices ensures operations slices", () => {
+    const out = ensureOperationsIndexReexportsOperationSlices("export {}\n");
     expect(out).toContain('export * from "./capabilities";');
     expect(out).toContain('export * from "./services";');
-    expect(out).not.toContain("refinements");
-    expect(out).not.toContain("branded-primitive");
   });
 });
