@@ -9,8 +9,8 @@ import tseslint from "typescript-eslint";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(dirname, "..", "..");
 
-// Single domain layer: features/*/core/domain (pattern in boundaries/elements).
-const domainTypes = ["domain"];
+const domainModelTypes = ["domain-models"];
+const domainOperationTypes = ["domain-operations"];
 
 /**
  * Orchestration slices that are NOT use-cases (ports, other orchestration helpers).
@@ -27,11 +27,13 @@ const orchestrationTypes = [
   ...orchestrationNonUseCaseSlices,
 ];
 
-const domainRefs = domainTypes.map((t) => ({ type: t }));
+const domainModelRefs = domainModelTypes.map((t) => ({ type: t }));
+const domainOperationRefs = domainOperationTypes.map((t) => ({ type: t }));
 
-/** Any orchestration file: domain + non–use-case orchestration only. */
+/** Any orchestration file: domain models/operations + non–use-case orchestration only. */
 const orchestrationAllowTo = [
-  ...domainRefs,
+  ...domainModelRefs,
+  ...domainOperationRefs,
   ...orchestrationNonUseCaseSlices.map((t) => ({ type: t })),
 ];
 
@@ -41,16 +43,17 @@ const infrastructureTypes = [
   "infrastructure-other",
 ];
 
-/** Infrastructure: domain + orchestration except use-cases + same-layer infra. */
+/** Infrastructure: domain-models + orchestration except use-cases + same-layer infra. */
 const infrastructureAllowTo = [
-  ...domainRefs,
+  ...domainModelRefs,
   ...orchestrationNonUseCaseSlices.map((t) => ({ type: t })),
   ...["infrastructure-lib", "infrastructure-other"].map((t) => ({ type: t })),
 ];
 
-/** Composition: domain, full orchestration, full infrastructure. */
+/** Composition: domain (models + operations), full orchestration, full infrastructure. */
 const compositionAllowTo = [
-  ...domainRefs,
+  ...domainModelRefs,
+  ...domainOperationRefs,
   ...orchestrationTypes.map((t) => ({ type: t })),
   ...infrastructureTypes.map((t) => ({ type: t })),
 ];
@@ -83,8 +86,12 @@ const config = defineConfig(
     settings: {
       "boundaries/elements": [
         {
-          type: "domain",
-          pattern: "features/*/core/domain/**",
+          type: "domain-models",
+          pattern: "features/*/core/domain/models/**",
+        },
+        {
+          type: "domain-operations",
+          pattern: "features/*/core/domain/operations/**",
         },
         {
           type: "orchestration-use-cases",
@@ -152,9 +159,15 @@ const config = defineConfig(
         {
           default: "disallow",
           rules: [
-            ...domainTypes.map((type) => ({
+            ...domainModelTypes.map((type) => ({
               from: { type },
-              allow: { to: domainRefs },
+              allow: { to: domainModelRefs },
+            })),
+            ...domainOperationTypes.map((type) => ({
+              from: { type },
+              allow: {
+                to: [...domainModelRefs, ...domainOperationRefs],
+              },
             })),
 
             ...orchestrationTypes.map((type) => ({

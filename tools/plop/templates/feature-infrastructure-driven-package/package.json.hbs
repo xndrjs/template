@@ -12,8 +12,9 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run"
   },
-{{#if hasOptionalXndrDeps}}
   "dependencies": {
+    "@features/{{featureKebab}}-core": "workspace:*"{{#if hasOptionalXndrDeps}},
+{{/if}}
 {{#if includeDataLayer}}
     "@xndrjs/data-layer": "{{workspaceDependencyVersion "@xndrjs/data-layer"}}"{{#if includeTasks}},
 {{/if}}
@@ -22,7 +23,6 @@
     "@xndrjs/tasks": "{{workspaceDependencyVersion "@xndrjs/tasks"}}"
 {{/if}}
   },
-{{/if}}
   "devDependencies": {
     "vitest": "{{workspaceDependencyVersion "vitest"}}"
   }
