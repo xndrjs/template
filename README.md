@@ -116,7 +116,7 @@ Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (ca
 | `feature-core-branded-shape`            | Branded shape in `domain/shapes/<kebab>.shape.ts`.                                                                                                                               |
 | `feature-core-refinement`               | Refinement next to the base file (`*.primitive.refinement.ts` / `*.shape.refinement.ts`) using `branded.refine(kit).when(…).as(…)` (@xndrjs/branded ≥ 0.1.0).                    |
 | `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                           |
-| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` via `createUseCase` from `@xndrjs/orchestration`; barrel updated.                                          |
+| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                     |
 
 ---
 
@@ -129,5 +129,5 @@ Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (ca
 ## Quick conventions
 
 - **File suffixes**: `.primitive.ts`, `.shape.ts`, `.primitive.refinement.ts`, `.shape.refinement.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
-- **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.3.0-alpha.0`), and `@xndrjs/orchestration` (`^0.3.0-alpha.0`) (use cases: `createUseCase` + anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.2-alpha.0`) via their generator.
+- **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.3.0-alpha.0`), and `@xndrjs/orchestration` (`^0.3.0-alpha.0`) (use cases as plain factories with anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.2-alpha.0`) via their generator.
 - **Smoke test**: after `pnpm demo:scaffold`, inspect `features/demo/`; `pnpm demo:clear` removes it.

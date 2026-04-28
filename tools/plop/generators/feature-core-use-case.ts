@@ -21,7 +21,7 @@ function stripTrailingUseCaseLabel(raw: string): string {
 export default function registerFeatureCoreUseCaseGenerator(plop: NodePlopAPI) {
   plop.setGenerator("feature-core-use-case", {
     description:
-      "Add an orchestration use case under core/orchestration/use-cases/ (`<kebab>.use-case.ts`, `create<Name>UseCase` via `@xndrjs/orchestration`); updates the slice barrel.",
+      "Add an orchestration use case under core/orchestration/use-cases/ (`<kebab>.use-case.ts`, `create<Name>UseCase` factory); updates the slice barrel.",
     prompts: [
       {
         type: "list",
