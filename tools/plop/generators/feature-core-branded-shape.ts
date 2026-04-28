@@ -62,6 +62,13 @@ export default function registerFeatureCoreBrandedShapeGenerator(
           skipIfExists: true,
         },
         {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/capabilities/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
           type: "modify",
           path: "../../{{corePackageRel}}/domain/index.ts",
           transform: (file: string) =>

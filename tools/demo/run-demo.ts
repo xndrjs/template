@@ -3,7 +3,7 @@
  *
  * Creates `features/demo/core`, `composition/web`, `infrastructure/driven-demo`,
  * `apps/demo-web` (workspace app wired to the demo composition),
- * plus primitives `HtmlContent` → proof `SanitizedHtmlContent`, one shape, shape proof,
+ * plus primitives `HtmlContent` → proof `SanitizedHtmlContent`, one shape, one capability, shape proof,
  * one domain service, one port, two use cases (wired into the composition root via
  * `composition-wire-use-cases`), then runs `pnpm install`.
  *
@@ -127,85 +127,91 @@ async function main(): Promise<void> {
   applyCommonPlopSetup(plop);
   registerPlopGenerators(plop);
 
-  console.log("\n1/14 feature-core …");
+  console.log("\n1/15 feature-core …");
   await runGenerator(plop, "feature-core", {
     featureName: "Demo",
   });
 
-  console.log("\n2/14 feature-composition-app …");
+  console.log("\n2/15 feature-composition-app …");
   await runGenerator(plop, "feature-composition-app", {
     corePackageRel: DEMO_CORE_REL,
     compositionAppKebab: "web",
   });
 
-  console.log("\n3/14 feature-infrastructure-driven-package …");
+  console.log("\n3/15 feature-infrastructure-driven-package …");
   await runGenerator(plop, "feature-infrastructure-driven-package", {
     corePackageRel: DEMO_CORE_REL,
     drivenSuffix: "demo",
     xndrInfraDrivenPackages: ["@xndrjs/data-layer", "@xndrjs/tasks"],
   });
 
-  console.log("\n4/14 feature-core-branded-primitive (HtmlContent) …");
+  console.log("\n4/15 feature-core-branded-primitive (HtmlContent) …");
   await runGenerator(plop, "feature-core-branded-primitive", {
     corePackageRel: DEMO_CORE_REL,
     primitiveName: "HtmlContent",
     primitiveValueKind: "string",
   });
 
-  console.log("\n5/14 feature-core-branded-shape …");
+  console.log("\n5/15 feature-core-branded-shape …");
   await runGenerator(plop, "feature-core-branded-shape", {
     corePackageRel: DEMO_CORE_REL,
     shapeName: "User",
   });
 
-  console.log("\n6/14 feature-core-proof (SanitizedHtmlContent) …");
+  console.log("\n6/15 feature-core-capability …");
+  await runGenerator(plop, "feature-core-capability", {
+    corePackageRel: DEMO_CORE_REL,
+    capabilityName: "UserRename",
+  });
+
+  console.log("\n7/15 feature-core-proof (SanitizedHtmlContent) …");
   await runGenerator(plop, "feature-core-proof", {
     corePackageRel: DEMO_CORE_REL,
     proofName: "SanitizedHtmlContent",
   });
 
-  console.log("\n7/14 feature-core-proof (VerifiedUser) …");
+  console.log("\n8/15 feature-core-proof (VerifiedUser) …");
   await runGenerator(plop, "feature-core-proof", {
     corePackageRel: DEMO_CORE_REL,
     proofName: "VerifiedUser",
   });
 
-  console.log("\n8/14 feature-core-service …");
+  console.log("\n9/15 feature-core-service …");
   await runGenerator(plop, "feature-core-service", {
     corePackageRel: DEMO_CORE_REL,
     serviceName: "UserCalculator",
   });
 
-  console.log("\n9/14 feature-core-port …");
+  console.log("\n10/15 feature-core-port …");
   await runGenerator(plop, "feature-core-port", {
     corePackageRel: DEMO_CORE_REL,
     portName: "UserNotifier",
   });
 
-  console.log("\n10/14 feature-core-use-case (VerifyUser) …");
+  console.log("\n11/15 feature-core-use-case (VerifyUser) …");
   await runGenerator(plop, "feature-core-use-case", {
     corePackageRel: DEMO_CORE_REL,
     useCaseName: "VerifyUser",
   });
 
-  console.log("\n11/14 feature-core-use-case (NotifyUser) …");
+  console.log("\n12/15 feature-core-use-case (NotifyUser) …");
   await runGenerator(plop, "feature-core-use-case", {
     corePackageRel: DEMO_CORE_REL,
     useCaseName: "NotifyUser",
   });
 
-  console.log("\n12/14 composition-wire-use-cases …");
+  console.log("\n13/15 composition-wire-use-cases …");
   await runGenerator(plop, "composition-wire-use-cases", {
     compositionPackageRel: DEMO_COMPOSITION_WEB_REL,
     corePackageRel: DEMO_CORE_REL,
     useCaseStems: ["verify-user", "notify-user"],
   });
 
-  console.log("\n13/14 apps/demo-web …");
+  console.log("\n14/15 apps/demo-web …");
   ensureDemoWebApp();
   console.log(`  [demo-web] wrote ${DEMO_WEB_REL}`);
 
-  console.log("\n14/14 done (scaffold paths created).");
+  console.log("\n15/15 done (scaffold paths created).");
 
   console.log(
     "\nRunning pnpm install (workspace links, refresh lockfile if needed)…"

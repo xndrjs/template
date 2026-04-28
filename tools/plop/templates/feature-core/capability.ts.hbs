@@ -1,0 +1,18 @@
+import { branded } from "@xndrjs/branded";
+
+export interface {{pascalCapabilityName}}CapabilityBase {
+  // add the properties on which this capability shall operate, i.e.
+  // displayName: string
+}
+
+export const {{pascalCapabilityName}}Capability = branded
+  .capabilities<{{pascalCapabilityName}}CapabilityBase>()
+  .methods((patch) => ({
+    // TODO add methods
+    // keep shape as the first parameter, type is automatically inferred
+    /* 
+    rename(shape, displayName: string) {
+      return patch(shape, { displayName });
+    },
+    */
+  }));

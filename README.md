@@ -107,16 +107,17 @@ There is **no** dedicated `mappers` orchestration slice: mapping stays where it 
 
 Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (casing, core package discovery, workspace dependency versions).
 
-| Generator                               | What it creates                                                                                                                                                                  |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `feature-core`                          | `features/<kebab>/core/` — `@features/<kebab>-core`, domain (primitive/shape/service barrels), orchestration (`use-cases`, `ports`), root `index.ts` and `package.json` exports. |
-| `feature-composition-app`               | `features/<kebab>/composition/<app>/` — composition package wired to core.                                                                                                       |
-| `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add `@xndrjs/data-layer` and/or `@xndrjs/tasks` (both selected by default).                  |
-| `feature-core-branded-primitive`        | Zod + `@xndrjs/branded` primitive in `domain/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                         |
-| `feature-core-branded-shape`            | Branded shape in `domain/shapes/<kebab>.shape.ts`.                                                                                                                               |
-| `feature-core-proof`                    | Schema-first proof under `domain/proofs/<kebab>.proof.ts` using `branded.proof(brand, schema)`.                                                                                  |
-| `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                           |
-| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                   |
+| Generator                               | What it creates                                                                                                                                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `feature-core`                          | `features/<kebab>/core/` — `@features/<kebab>-core`, domain (primitive/shape/proof/capability/service barrels), orchestration (`use-cases`, `ports`), root `index.ts` and `package.json` exports. |
+| `feature-composition-app`               | `features/<kebab>/composition/<app>/` — composition package wired to core.                                                                                                                        |
+| `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add `@xndrjs/data-layer` and/or `@xndrjs/tasks` (both selected by default).                                   |
+| `feature-core-branded-primitive`        | Zod + `@xndrjs/branded` primitive in `domain/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                                          |
+| `feature-core-branded-shape`            | Branded shape in `domain/shapes/<kebab>.shape.ts`.                                                                                                                                                |
+| `feature-core-proof`                    | Schema-first proof under `domain/proofs/<kebab>.proof.ts` using `branded.proof(brand, schema)`.                                                                                                   |
+| `feature-core-capability`               | Reusable capability under `domain/capabilities/<kebab>.capability.ts` using `branded.capabilities<...>().methods(...)`.                                                                           |
+| `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                                            |
+| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                                    |
 
 ---
 
@@ -128,6 +129,6 @@ Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (ca
 
 ## Quick conventions
 
-- **File suffixes**: `.primitive.ts`, `.shape.ts`, `.proof.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
+- **File suffixes**: `.primitive.ts`, `.shape.ts`, `.proof.ts`, `.capability.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
 - **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.3.0-alpha.0`), and `@xndrjs/orchestration` (`^0.3.0-alpha.0`) (use cases as plain factories with anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.2-alpha.0`) via their generator.
 - **Smoke test**: after `pnpm demo:scaffold`, inspect `features/demo/`; `pnpm demo:clear` removes it.

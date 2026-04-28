@@ -15,10 +15,12 @@ export function appendExportToBarrelIndex(
 
 const PRIMITIVES_REEXPORT = 'export * from "./primitives";';
 const SHAPES_REEXPORT = 'export * from "./shapes";';
+const PROOFS_REEXPORT = 'export * from "./proofs";';
+const CAPABILITIES_REEXPORT = 'export * from "./capabilities";';
 const SERVICES_REEXPORT = 'export * from "./services";';
 
 /**
- * Ensure `domain/index.ts` re-exports `primitives/`, `shapes/`, and `services/` barrels only.
+ * Ensure `domain/index.ts` re-exports domain slice barrels.
  * Strips legacy per-file exports and old `refinements/` barrel lines.
  */
 export function ensureDomainIndexReexportsDomainSlices(file: string): string {
@@ -41,6 +43,12 @@ export function ensureDomainIndexReexportsDomainSlices(file: string): string {
   }
   if (!body.includes(SHAPES_REEXPORT)) {
     body = `${body}\n${SHAPES_REEXPORT}`;
+  }
+  if (!body.includes(PROOFS_REEXPORT)) {
+    body = `${body}\n${PROOFS_REEXPORT}`;
+  }
+  if (!body.includes(CAPABILITIES_REEXPORT)) {
+    body = `${body}\n${CAPABILITIES_REEXPORT}`;
   }
   if (!body.includes(SERVICES_REEXPORT)) {
     body = `${body}\n${SERVICES_REEXPORT}`;

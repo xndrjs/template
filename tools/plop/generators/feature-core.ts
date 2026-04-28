@@ -82,6 +82,18 @@ export default function registerFeatureCoreGenerator(plop: NodePlopAPI) {
         },
         {
           type: "add",
+          path: "../../features/{{kebabCase featureName}}/core/domain/proofs/index.ts",
+          templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../features/{{kebabCase featureName}}/core/domain/capabilities/index.ts",
+          templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
+          skipIfExists: true,
+        },
+        {
+          type: "add",
           path: "../../features/{{kebabCase featureName}}/core/domain/index.ts",
           templateFile: `${TEMPLATE_PREFIX}/domain-index.ts.hbs`,
           skipIfExists: true,
