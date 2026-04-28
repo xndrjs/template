@@ -50,10 +50,9 @@ const infrastructureAllowTo = [
   ...["infrastructure-lib", "infrastructure-other"].map((t) => ({ type: t })),
 ];
 
-/** Composition: domain (models + operations), full orchestration, full infrastructure. */
+/** Composition: domain-models, full orchestration, full infrastructure. */
 const compositionAllowTo = [
   ...domainModelRefs,
-  ...domainOperationRefs,
   ...orchestrationTypes.map((t) => ({ type: t })),
   ...infrastructureTypes.map((t) => ({ type: t })),
 ];

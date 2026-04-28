@@ -18,7 +18,7 @@ In short:
 ## What is in this repo (current state)
 
 - **pnpm workspace** in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml): `apps/*`, `configs/*`, `composition/*`, packages under `features/*/*`, `features/*/composition/*`, `features/*/infrastructure/*`.
-- **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@<slug>/core`, `@<slug>/composition-*`, `@<slug/driven-*`).
+- **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@<slug>/core`, `@<slug>/composition-*`, `@<slug>/driven-*`).
 - **Package naming config**: scope/pattern names for generated packages are centralized in [`tools/plop/lib/package-naming.ts`](./tools/plop/lib/package-naming.ts) (`PACKAGE_SCOPES` + naming helpers), so you can customize conventions in one place.
 - **Flat package roots**: no required `src/` folder; sources and barrels live at the package root (`index.ts`, slices in subfolders).
 - **Shared configs** in `configs/`: TypeScript (`@features/config-typescript`), ESLint (`@features/config-eslint`), Vitest (`@features/config-vitest`).
