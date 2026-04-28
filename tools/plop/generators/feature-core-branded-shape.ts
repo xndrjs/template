@@ -14,7 +14,7 @@ export default function registerFeatureCoreBrandedShapeGenerator(
 ) {
   plop.setGenerator("feature-core-branded-shape", {
     description:
-      "Add a Zod + @xndrjs/branded shape under core/domain/shapes/ (`<kebab>.shape.ts`); returns `[kit, patch]` — see https://www.npmjs.com/package/@xndrjs/branded",
+      "Add a Zod + @xndrjs/branded shape under core/domain/shapes/ (`<kebab>.shape.ts`); exports `const <Name>Shape = branded.shape(...)` — see https://www.npmjs.com/package/@xndrjs/branded",
     prompts: [
       {
         type: "list",

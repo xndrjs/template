@@ -3,7 +3,7 @@ import { applyCommonPlopSetup } from "./plop-register-common.ts";
 import registerFeatureCoreGenerator from "./generators/feature-core.ts";
 import registerFeatureCoreBrandedPrimitiveGenerator from "./generators/feature-core-branded-primitive.ts";
 import registerFeatureCoreBrandedShapeGenerator from "./generators/feature-core-branded-shape.ts";
-import registerFeatureCoreRefinementGenerator from "./generators/feature-core-refinement.ts";
+import registerFeatureCoreProofGenerator from "./generators/feature-core-proof.ts";
 import registerFeatureCoreUseCaseGenerator from "./generators/feature-core-use-case.ts";
 import registerFeatureCorePortGenerator from "./generators/feature-core-port.ts";
 import registerFeatureCoreServiceGenerator from "./generators/feature-core-service.ts";
@@ -18,7 +18,7 @@ export function registerPlopGenerators(plop: NodePlopAPI) {
   registerCompositionWireUseCasesGenerator(plop);
   registerFeatureCoreBrandedPrimitiveGenerator(plop);
   registerFeatureCoreBrandedShapeGenerator(plop);
-  registerFeatureCoreRefinementGenerator(plop);
+  registerFeatureCoreProofGenerator(plop);
   registerFeatureCoreUseCaseGenerator(plop);
   registerFeatureCorePortGenerator(plop);
   registerFeatureCoreServiceGenerator(plop);

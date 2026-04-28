@@ -8,19 +8,6 @@ export const {{pascalName}}Schema = z.object({
   // payload: z.string().min(1),
 });
 
-const [{{pascalName}}Shape, patch{{pascalName}}] = branded.shape(
-  "{{pascalName}}",
-  {{pascalName}}Schema,
-  {
-    methods: {
-      // use `this` to refer to the current {{pascalName}} instance:
-      // getPayloadLength() {
-      //   return this.payload.length;
-      // },
-    },
-  }
-);
+export const {{pascalName}}Shape = branded.shape("{{pascalName}}", {{pascalName}}Schema);
 
 export type {{pascalName}} = BrandedType<typeof {{pascalName}}Shape>;
-
-export { {{pascalName}}Shape };

@@ -1,0 +1,18 @@
+import { branded, BrandedType } from "@xndrjs/branded";
+import { z } from "zod";
+
+/**
+ * Schema-first proof `{{proofPascal}}`.
+ * Define a specific schema or import an existing schema.
+ */
+const {{proofPascal}}Schema = z.object({
+  // TODO example, remove this
+  // isVerified: z.literal(true),
+});
+
+export const {{proofPascal}}Proof = branded
+  .proof("{{proofPascal}}", {{proofPascal}}Schema)
+  // you can refine the output type like this, if needed:
+  // .refineType<{ someProperty: true }>((row) => row.someProperty === true);
+
+export type {{proofPascal}} = BrandedType<typeof {{proofPascal}}Proof>;

@@ -14,9 +14,9 @@ export const PlopDemoId = branded.primitive("PlopDemoId", PlopDemoIdSchema);
     expect(parsePrimitiveKitId(src)).toBe("PlopDemoId");
   });
 
-  it("parseShapeKitId finds shape kit export (legacy export const tuple)", () => {
+  it("parseShapeKitId finds shape kit export (export const assignment)", () => {
     const src = `
-export const [PlopDemoPayloadShape, patchPlopDemoPayload] = branded.shape(
+export const PlopDemoPayloadShape = branded.shape(
   "PlopDemoPayload",
   PlopDemoPayloadSchema
 );
@@ -24,17 +24,26 @@ export const [PlopDemoPayloadShape, patchPlopDemoPayload] = branded.shape(
     expect(parseShapeKitId(src)).toBe("PlopDemoPayloadShape");
   });
 
-  it("parseShapeKitId finds shape kit (internal tuple + export { Shape })", () => {
+  it("parseShapeKitId finds shape kit (const assignment + export { Shape })", () => {
     const src = `
-const [UserShape, patchUser] = branded.shape(
+const UserShape = branded.shape(
   "User",
-  UserSchema,
-  { methods: {} }
+  UserSchema
 );
 export type User = BrandedType<typeof UserShape>;
 export { UserShape };
 `;
     expect(parseShapeKitId(src)).toBe("UserShape");
+  });
+
+  it("parseShapeKitId keeps supporting legacy tuple declarations", () => {
+    const src = `
+const [LegacyUserShape, patchLegacyUser] = branded.shape(
+  "LegacyUser",
+  LegacyUserSchema
+);
+`;
+    expect(parseShapeKitId(src)).toBe("LegacyUserShape");
   });
 
   it("parseShapeKitId falls back to named export only", () => {

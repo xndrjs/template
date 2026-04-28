@@ -6,7 +6,7 @@
 
 This monorepo **wires those ideas into a concrete layout**: feature-first folders, clear boundaries between domain, orchestration, composition, and adapters, with ESLint enforcing dependency rules. You do not reinvent the structure each time: you start from conventions and keep your code aligned from day one.
 
-The second pillar is **speed to first useful commit**. [Plop](https://plopjs.com) generators (`pnpm plop`) scaffold core packages, domain slices (primitive / shape / refinement), ports, use cases, composition apps, and `driven-*` packages—with optional dependencies on `@xndrjs/data-layer` and `@xndrjs/tasks`. A few prompts give you files, barrels, and `package.json` exports consistent with the rest of the repo, instead of hand-copying trees.
+The second pillar is **speed to first useful commit**. [Plop](https://plopjs.com) generators (`pnpm plop`) scaffold core packages, domain slices (primitive / shape / proof), ports, use cases, composition apps, and `driven-*` packages—with optional dependencies on `@xndrjs/data-layer` and `@xndrjs/tasks`. A few prompts give you files, barrels, and `package.json` exports consistent with the rest of the repo, instead of hand-copying trees.
 
 In short:
 
@@ -32,11 +32,11 @@ The root package is named `hexagonal-template` in [`package.json`](./package.jso
 
 A typical feature follows this shape (all generatable with Plop):
 
-| Path                                             | Example package                         | Role                                                                                                                                                                                                                                                    |
-| ------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `features/<kebab>/core/`                         | `@features/<kebab>-core`                | **Domain** (`domain/`: Zod + branded primitives, shapes, refinements) and **orchestration** (`orchestration/use-cases`, `orchestration/ports`, plus other orchestration files under `orchestration/` that classify as `orchestration-other` in ESLint). |
-| `features/<kebab>/composition/<app>/`            | `@features/<kebab>-composition-<app>`   | Wiring for a surface (HTTP, CLI, jobs): assembles dependencies and use cases; depends on core.                                                                                                                                                          |
-| `features/<kebab>/infrastructure/driven-<name>/` | `@features/<kebab>-infra-driven-<name>` | Outbound adapters (persistence, external APIs, etc.): flat `.ts` files at the package root, re-exported from `index.ts`.                                                                                                                                |
+| Path                                             | Example package                         | Role                                                                                                                                                                                                                                               |
+| ------------------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `features/<kebab>/core/`                         | `@features/<kebab>-core`                | **Domain** (`domain/`: Zod + branded primitives, shapes, proofs) and **orchestration** (`orchestration/use-cases`, `orchestration/ports`, plus other orchestration files under `orchestration/` that classify as `orchestration-other` in ESLint). |
+| `features/<kebab>/composition/<app>/`            | `@features/<kebab>-composition-<app>`   | Wiring for a surface (HTTP, CLI, jobs): assembles dependencies and use cases; depends on core.                                                                                                                                                     |
+| `features/<kebab>/infrastructure/driven-<name>/` | `@features/<kebab>-infra-driven-<name>` | Outbound adapters (persistence, external APIs, etc.): flat `.ts` files at the package root, re-exported from `index.ts`.                                                                                                                           |
 
 **Cross-package imports** must use workspace package names and each package’s `exports`—not raw paths like `features/...` (blocked by `no-restricted-imports`).
 
@@ -114,9 +114,9 @@ Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (ca
 | `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add `@xndrjs/data-layer` and/or `@xndrjs/tasks` (both selected by default).                  |
 | `feature-core-branded-primitive`        | Zod + `@xndrjs/branded` primitive in `domain/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                         |
 | `feature-core-branded-shape`            | Branded shape in `domain/shapes/<kebab>.shape.ts`.                                                                                                                               |
-| `feature-core-refinement`               | Refinement next to the base file (`*.primitive.refinement.ts` / `*.shape.refinement.ts`) using `branded.refine(kit).when(…).as(…)` (@xndrjs/branded ≥ 0.1.0).                    |
+| `feature-core-proof`                    | Schema-first proof under `domain/proofs/<kebab>.proof.ts` using `branded.proof(brand, schema)`.                                                                                  |
 | `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                           |
-| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                     |
+| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                   |
 
 ---
 
@@ -128,6 +128,6 @@ Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (ca
 
 ## Quick conventions
 
-- **File suffixes**: `.primitive.ts`, `.shape.ts`, `.primitive.refinement.ts`, `.shape.refinement.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
+- **File suffixes**: `.primitive.ts`, `.shape.ts`, `.proof.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
 - **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.3.0-alpha.0`), and `@xndrjs/orchestration` (`^0.3.0-alpha.0`) (use cases as plain factories with anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.2-alpha.0`) via their generator.
 - **Smoke test**: after `pnpm demo:scaffold`, inspect `features/demo/`; `pnpm demo:clear` removes it.

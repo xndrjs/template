@@ -3,7 +3,7 @@
  *
  * Creates `features/demo/core`, `composition/web`, `infrastructure/driven-demo`,
  * `apps/demo-web` (workspace app wired to the demo composition),
- * plus primitives `HtmlContent` → refinement `SanitizedHtmlContent`, one shape, shape refinement,
+ * plus primitives `HtmlContent` → proof `SanitizedHtmlContent`, one shape, shape proof,
  * one domain service, one port, two use cases (wired into the composition root via
  * `composition-wire-use-cases`), then runs `pnpm install`.
  *
@@ -158,22 +158,16 @@ async function main(): Promise<void> {
     shapeName: "User",
   });
 
-  console.log(
-    "\n6/14 feature-core-refinement (primitive → SanitizedHtmlContent) …"
-  );
-  await runGenerator(plop, "feature-core-refinement", {
+  console.log("\n6/14 feature-core-proof (SanitizedHtmlContent) …");
+  await runGenerator(plop, "feature-core-proof", {
     corePackageRel: DEMO_CORE_REL,
-    baseKind: "primitive",
-    baseDomainRelPath: "primitives/html-content.primitive.ts",
-    refinementName: "SanitizedHtmlContent",
+    proofName: "SanitizedHtmlContent",
   });
 
-  console.log("\n7/14 feature-core-refinement (shape) …");
-  await runGenerator(plop, "feature-core-refinement", {
+  console.log("\n7/14 feature-core-proof (VerifiedUser) …");
+  await runGenerator(plop, "feature-core-proof", {
     corePackageRel: DEMO_CORE_REL,
-    baseKind: "shape",
-    baseDomainRelPath: "shapes/user.shape.ts",
-    refinementName: "VerifiedUser",
+    proofName: "VerifiedUser",
   });
 
   console.log("\n8/14 feature-core-service …");
