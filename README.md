@@ -21,7 +21,7 @@ In short:
 - **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@<slug>/core`, `@<slug>/composition-*`, `@<slug>/driven-*`).
 - **Package naming config**: scope/pattern names for generated packages are centralized in [`tools/plop/lib/package-naming.ts`](./tools/plop/lib/package-naming.ts) (`PACKAGE_SCOPES` + naming helpers), so you can customize conventions in one place.
 - **Flat package roots**: no required `src/` folder; sources and barrels live at the package root (`index.ts`, slices in subfolders).
-- **Shared configs** in `configs/`: TypeScript (`@features/config-typescript`), ESLint (`@features/config-eslint`), Vitest (`@features/config-vitest`).
+- **Shared configs** in `configs/`: TypeScript (`@config/typescript`), ESLint (`@config/eslint`), Vitest (`@config/vitest`).
 - **Tooling** in `tools/`: a single Plop setup ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)), scaffold demo ([`tools/demo/run-demo.ts`](./tools/demo/run-demo.ts)).
 - **Quality**: Prettier, Husky, lint-staged, Vitest; optional Renovate via [`renovate.json`](./renovate.json).
 
@@ -100,7 +100,7 @@ There is **no** dedicated `mappers` orchestration slice: mapping stays where it 
 
 ## Tests
 
-[`vitest.config.ts`](./vitest.config.ts) uses `defineBaseVitestConfig` from `@features/config-vitest` and includes `features/**/*.test.ts` and `tools/**/*.test.ts`.
+[`vitest.config.ts`](./vitest.config.ts) uses `defineBaseVitestConfig` from `@config/vitest` and includes `features/**/*.test.ts` and `tools/**/*.test.ts`.
 
 ---
 

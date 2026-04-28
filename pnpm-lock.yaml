@@ -8,10 +8,10 @@ importers:
 
   .:
     devDependencies:
-      '@features/config-eslint':
+      '@config/eslint':
         specifier: workspace:^
         version: link:configs/config-eslint
-      '@features/config-vitest':
+      '@config/vitest':
         specifier: workspace:^
         version: link:configs/config-vitest
       '@types/node':

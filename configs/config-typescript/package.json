@@ -1,5 +1,5 @@
 {
-  "name": "@features/config-typescript",
+  "name": "@config/typescript",
   "version": "1.0.0",
   "private": true,
   "description": "Shared TypeScript configuration for the monorepo",

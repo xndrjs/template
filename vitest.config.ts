@@ -1,5 +1,5 @@
 // Vitest config for the whole monorepo
-import { defineBaseVitestConfig } from "@features/config-vitest";
+import { defineBaseVitestConfig } from "@config/vitest";
 
 export default defineBaseVitestConfig({
   test: {

@@ -16,8 +16,8 @@
     "deps:renovate": "npx -p renovate renovate-config-validator renovate.json"
   },
   "devDependencies": {
-    "@features/config-eslint": "workspace:^",
-    "@features/config-vitest": "workspace:^",
+    "@config/eslint": "workspace:^",
+    "@config/vitest": "workspace:^",
     "@types/node": "^25.5.0",
     "@vitest/coverage-v8": "^4.1.0",
     "@xndrjs/branded": "^0.3.0-alpha.0",
