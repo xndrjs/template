@@ -13,7 +13,8 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
     "prepare": "husky",
-    "deps:renovate": "npx -p renovate renovate-config-validator renovate.json"
+    "deps:renovate": "npx -p renovate renovate-config-validator renovate.json",
+    "arch:packages:dsl": "tsx tools/arch/generate-workspace-packages-dsl.ts"
   },
   "devDependencies": {
     "@config/eslint": "workspace:^",

@@ -58,15 +58,16 @@ pnpm demo:scaffold # smoke test: creates features/demo/ (remove with pnpm demo:c
 
 ## Root scripts
 
-| Script                                                 | Description                                                                 |
-| ------------------------------------------------------ | --------------------------------------------------------------------------- |
-| `pnpm lint` / `pnpm lint:fix`                          | ESLint on the whole repo (including architectural rules).                   |
-| `pnpm format` / `pnpm format:check`                    | Prettier.                                                                   |
-| `pnpm test` / `pnpm test:watch` / `pnpm test:coverage` | Vitest.                                                                     |
-| `pnpm plop`                                            | Opens the Plop menu ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)). |
-| `pnpm demo:scaffold`                                   | Runs the main generators in sequence on `features/demo/`.                   |
-| `pnpm demo:clear`                                      | Deletes `features/demo/`.                                                   |
-| `pnpm deps:renovate`                                   | Validates `renovate.json`.                                                  |
+| Script                                                 | Description                                                                                                                                              |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint` / `pnpm lint:fix`                          | ESLint on the whole repo (including architectural rules).                                                                                                |
+| `pnpm format` / `pnpm format:check`                    | Prettier.                                                                                                                                                |
+| `pnpm test` / `pnpm test:watch` / `pnpm test:coverage` | Vitest.                                                                                                                                                  |
+| `pnpm plop`                                            | Opens the Plop menu ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)).                                                                              |
+| `pnpm demo:scaffold`                                   | Runs the main generators in sequence on `features/demo/`.                                                                                                |
+| `pnpm demo:clear`                                      | Deletes `features/demo/`.                                                                                                                                |
+| `pnpm deps:renovate`                                   | Validates `renovate.json`.                                                                                                                               |
+| `pnpm arch:packages:dsl`                               | Generates C4-oriented [Structurizr DSL](https://docs.structurizr.com/dsl) for workspace packages (`docs/architecture/generated/workspace-packages.dsl`). |
 
 Lint a single package: `pnpm -C features/<slug>/core lint`.
 
