@@ -6,6 +6,10 @@ import {
   compositionPackageRelFromCoreRel,
   featureSegmentFromCorePackageRel,
 } from "../lib/repo-core-paths.ts";
+import {
+  compositionPackageName,
+  corePackageName,
+} from "../lib/package-naming.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
 
@@ -23,13 +27,12 @@ export default function registerFeatureCompositionAppGenerator(
       {
         type: "list",
         name: "corePackageRel",
-        message:
-          "Select @features/*-core package (same feature as this composition root):",
+        message: "Select core package (same feature as this composition root):",
         choices: () => {
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-core packages found. Add features/<slug>/core/package.json with "name": "@features/<slug>-core".'
+              "No core packages found. Add features/<slug>/core/package.json with a valid core package name."
             );
           }
           return c;
@@ -66,6 +69,11 @@ export default function registerFeatureCompositionAppGenerator(
         compositionAppKebab
       );
       const featureKebab = featureSegmentFromCorePackageRel(coreRel);
+      const corePkgName = corePackageName(featureKebab);
+      const compositionPkgName = compositionPackageName(
+        featureKebab,
+        compositionAppKebab
+      );
       const pascalFeature = toPascalCase(featureKebab);
       const pascalApp = toPascalCase(compositionAppKebab);
       const pascalProvider = `${pascalFeature}${pascalApp}`;
@@ -79,6 +87,8 @@ export default function registerFeatureCompositionAppGenerator(
 
       const templateData = {
         featureKebab,
+        corePackageName: corePkgName,
+        compositionPackageName: compositionPkgName,
         pascalFeature,
         compositionAppKebab,
         pascalProvider,

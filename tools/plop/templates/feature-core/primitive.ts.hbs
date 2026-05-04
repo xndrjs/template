@@ -1,9 +1,12 @@
 import { z } from "zod";
-import { branded, BrandedType } from "@xndrjs/branded";
+import { domain, zodToValidator } from "@xndrjs/domain-zod";
 
 // TODO: tighten schema (bounds, formats, …) for your domain
 const {{pascalName}}Schema = {{{primitiveSchemaExpr}}};
 
-export const {{pascalName}} = branded.primitive("{{pascalName}}", {{pascalName}}Schema);
+export const {{pascalName}} = domain.primitive(
+  "{{pascalName}}",
+  zodToValidator({{pascalName}}Schema)
+);
 
-export type {{pascalName}} = BrandedType<typeof {{pascalName}}>;
+export type {{pascalName}} = ReturnType<typeof {{pascalName}}["create"]>;

@@ -2,11 +2,11 @@
 
 ## Why this repo exists
 
-**xndrjs** is a family of small TypeScript libraries aimed at real-world apps: safer domain types ([`@xndrjs/branded`](https://www.npmjs.com/package/@xndrjs/branded) with Zod), data-layer helpers ([`@xndrjs/data-layer`](https://www.npmjs.com/package/@xndrjs/data-layer)), retryable async tasks ([`@xndrjs/tasks`](https://www.npmjs.com/package/@xndrjs/tasks)), and more. They are building blocks for a clean architecture — not a framework replacement.
+**xndrjs** is a family of small TypeScript libraries aimed at real-world apps: safer domain types ([`@xndrjs/domain-zod`](https://www.npmjs.com/package/@xndrjs/domain-zod) — Zod 4 adapter over [`@xndrjs/domain`](https://www.npmjs.com/package/@xndrjs/domain)), retryable async tasks ([`@xndrjs/tasks`](https://www.npmjs.com/package/@xndrjs/tasks)), and more. They are building blocks for a clean architecture — not a framework replacement.
 
 This monorepo **wires those ideas into a concrete layout**: feature-first folders, clear boundaries between domain, orchestration, composition, and adapters, with ESLint enforcing dependency rules. You do not reinvent the structure each time: you start from conventions and keep your code aligned from day one.
 
-The second pillar is **speed to first useful commit**. [Plop](https://plopjs.com) generators (`pnpm plop`) scaffold core packages, domain slices (primitive / shape / refinement), ports, use cases, composition apps, and `driven-*` packages—with optional dependencies on `@xndrjs/data-layer` and `@xndrjs/tasks`. A few prompts give you files, barrels, and `package.json` exports consistent with the rest of the repo, instead of hand-copying trees.
+The second pillar is **speed to first useful commit**. [Plop](https://plopjs.com) generators (`pnpm plop`) scaffold core packages, domain slices (primitive / shape / proof), ports, use cases, composition apps, and `driven-*` packages—with an optional dependency on [`@xndrjs/tasks`](https://www.npmjs.com/package/@xndrjs/tasks) for driven adapters when you need it. A few prompts give you files, barrels, and `package.json` exports consistent with the rest of the repo, instead of hand-copying trees.
 
 In short:
 
@@ -18,11 +18,12 @@ In short:
 ## What is in this repo (current state)
 
 - **pnpm workspace** in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml): `apps/*`, `configs/*`, `composition/*`, packages under `features/*/*`, `features/*/composition/*`, `features/*/infrastructure/*`.
-- **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@features/...` naming).
+- **Feature-first**: each capability lives under `features/<slug>/` with dedicated workspace packages (`@<slug>/core`, `@<slug>/composition-*`, `@<slug>/driven-*`).
+- **Package naming config**: scope/pattern names for generated packages are centralized in [`tools/plop/lib/package-naming.ts`](./tools/plop/lib/package-naming.ts) (`PACKAGE_SCOPES` + naming helpers), so you can customize conventions in one place.
 - **Flat package roots**: no required `src/` folder; sources and barrels live at the package root (`index.ts`, slices in subfolders).
-- **Shared configs** in `configs/`: TypeScript (`@features/config-typescript`), ESLint (`@features/config-eslint`), Vitest (`@features/config-vitest`).
+- **Shared configs** in `configs/`: TypeScript (`@config/typescript`), ESLint (`@config/eslint`), Vitest (`@config/vitest`).
 - **Tooling** in `tools/`: a single Plop setup ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)), scaffold demo ([`tools/demo/run-demo.ts`](./tools/demo/run-demo.ts)).
-- **Quality**: Prettier, Husky, lint-staged, Vitest; optional Renovate via [`renovate.json`](./renovate.json).
+- **Quality**: Prettier, Husky, lint-staged, Vitest.
 
 The root package is named `hexagonal-template` in [`package.json`](./package.json): a private template to clone or fork, not a published library.
 
@@ -32,11 +33,11 @@ The root package is named `hexagonal-template` in [`package.json`](./package.jso
 
 A typical feature follows this shape (all generatable with Plop):
 
-| Path                                             | Example package                         | Role                                                                                                                                                                                                                                                    |
-| ------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `features/<kebab>/core/`                         | `@features/<kebab>-core`                | **Domain** (`domain/`: Zod + branded primitives, shapes, refinements) and **orchestration** (`orchestration/use-cases`, `orchestration/ports`, plus other orchestration files under `orchestration/` that classify as `orchestration-other` in ESLint). |
-| `features/<kebab>/composition/<app>/`            | `@features/<kebab>-composition-<app>`   | Wiring for a surface (HTTP, CLI, jobs): assembles dependencies and use cases; depends on core.                                                                                                                                                          |
-| `features/<kebab>/infrastructure/driven-<name>/` | `@features/<kebab>-infra-driven-<name>` | Outbound adapters (persistence, external APIs, etc.): flat `.ts` files at the package root, re-exported from `index.ts`.                                                                                                                                |
+| Path                                             | Example package              | Role                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `features/<kebab>/core/`                         | `@<kebab>/core`              | **Domain** split in `domain/models` (primitives, shapes, proofs) and `domain/operations` (capabilities, services), plus **orchestration** (`orchestration/use-cases`, `orchestration/ports`, and other orchestration files classified as `orchestration-other` in ESLint). |
+| `features/<kebab>/composition/<app>/`            | `@<kebab>/composition-<app>` | Wiring for a surface (HTTP, CLI, jobs): assembles dependencies and use cases; depends on core.                                                                                                                                                                             |
+| `features/<kebab>/infrastructure/driven-<name>/` | `@<kebab>/driven-<name>`     | Outbound adapters (persistence, external APIs, etc.): flat `.ts` files at the package root, re-exported from `index.ts`.                                                                                                                                                   |
 
 **Cross-package imports** must use workspace package names and each package’s `exports`—not raw paths like `features/...` (blocked by `no-restricted-imports`).
 
@@ -57,15 +58,15 @@ pnpm demo:scaffold # smoke test: creates features/demo/ (remove with pnpm demo:c
 
 ## Root scripts
 
-| Script                                                 | Description                                                                 |
-| ------------------------------------------------------ | --------------------------------------------------------------------------- |
-| `pnpm lint` / `pnpm lint:fix`                          | ESLint on the whole repo (including architectural rules).                   |
-| `pnpm format` / `pnpm format:check`                    | Prettier.                                                                   |
-| `pnpm test` / `pnpm test:watch` / `pnpm test:coverage` | Vitest.                                                                     |
-| `pnpm plop`                                            | Opens the Plop menu ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)). |
-| `pnpm demo:scaffold`                                   | Runs the main generators in sequence on `features/demo/`.                   |
-| `pnpm demo:clear`                                      | Deletes `features/demo/`.                                                   |
-| `pnpm deps:renovate`                                   | Validates `renovate.json`.                                                  |
+| Script                                                 | Description                                                                                                                                              |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint` / `pnpm lint:fix`                          | ESLint on the whole repo (including architectural rules).                                                                                                |
+| `pnpm format` / `pnpm format:check`                    | Prettier.                                                                                                                                                |
+| `pnpm test` / `pnpm test:watch` / `pnpm test:coverage` | Vitest.                                                                                                                                                  |
+| `pnpm plop`                                            | Opens the Plop menu ([`tools/plop/plopfile.ts`](./tools/plop/plopfile.ts)).                                                                              |
+| `pnpm demo:scaffold`                                   | Runs the main generators in sequence on `features/demo/`.                                                                                                |
+| `pnpm demo:clear`                                      | Deletes `features/demo/`.                                                                                                                                |
+| `pnpm arch:packages:dsl`                               | Generates C4-oriented [Structurizr DSL](https://docs.structurizr.com/dsl) for workspace packages (`docs/architecture/generated/workspace-packages.dsl`). |
 
 Lint a single package: `pnpm -C features/<slug>/core lint`.
 
@@ -99,7 +100,7 @@ There is **no** dedicated `mappers` orchestration slice: mapping stays where it 
 
 ## Tests
 
-[`vitest.config.ts`](./vitest.config.ts) uses `defineBaseVitestConfig` from `@features/config-vitest` and includes `features/**/*.test.ts` and `tools/**/*.test.ts`.
+[`vitest.config.ts`](./vitest.config.ts) uses `defineBaseVitestConfig` from `@config/vitest` and includes `features/**/*.test.ts` and `tools/**/*.test.ts`.
 
 ---
 
@@ -107,27 +108,22 @@ There is **no** dedicated `mappers` orchestration slice: mapping stays where it 
 
 Command: `pnpm plop`. Helpers live in [`tools/plop/lib/`](./tools/plop/lib/) (casing, core package discovery, workspace dependency versions).
 
-| Generator                               | What it creates                                                                                                                                                                  |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `feature-core`                          | `features/<kebab>/core/` — `@features/<kebab>-core`, domain (primitive/shape/service barrels), orchestration (`use-cases`, `ports`), root `index.ts` and `package.json` exports. |
-| `feature-composition-app`               | `features/<kebab>/composition/<app>/` — composition package wired to core.                                                                                                       |
-| `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add `@xndrjs/data-layer` and/or `@xndrjs/tasks` (both selected by default).                  |
-| `feature-core-branded-primitive`        | Zod + `@xndrjs/branded` primitive in `domain/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                         |
-| `feature-core-branded-shape`            | Branded shape in `domain/shapes/<kebab>.shape.ts`.                                                                                                                               |
-| `feature-core-refinement`               | Refinement next to the base file (`*.primitive.refinement.ts` / `*.shape.refinement.ts`) using `branded.refine(kit).when(…).as(…)` (@xndrjs/branded ≥ 0.1.0).                    |
-| `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                           |
-| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` via `createUseCase` from `@xndrjs/orchestration`; barrel updated.                                          |
-
----
-
-## Renovate
-
-[`renovate.json`](./renovate.json) automates dependency and lockfile updates on your forge ([Renovate docs](https://docs.renovatebot.com/)). Local validation: `pnpm deps:renovate`.
+| Generator                               | What it creates                                                                                                                                                                   |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `feature-core`                          | `features/<kebab>/core/` — `@core/<kebab>`, domain split entry points (`models`, `operations`), orchestration (`use-cases`, `ports`), root `index.ts` and `package.json` exports. |
+| `feature-composition-app`               | `features/<kebab>/composition/<app>/` — composition package wired to core.                                                                                                        |
+| `feature-infrastructure-driven-package` | `features/<kebab>/infrastructure/driven-<name>/` — adapter package; **checkbox** to add [`@xndrjs/tasks`](https://www.npmjs.com/package/@xndrjs/tasks) (selected by default).     |
+| `feature-core-domain-primitive`         | Zod + `@xndrjs/domain-zod` primitive in `domain/models/primitives/<kebab>.primitive.ts` (prompt: string / number / boolean / date / uuid / bigint / custom `z.*`).                |
+| `feature-core-domain-shape`             | Domain shape in `domain/models/shapes/<kebab>.shape.ts` (`domain.shape` + `zodToValidator`).                                                                                      |
+| `feature-core-proof`                    | Schema-first proof under `domain/models/proofs/<kebab>.proof.ts` using `domain.proof(brand, zodToValidator(schema))`.                                                             |
+| `feature-core-capability`               | Reusable capability under `domain/operations/capabilities/<kebab>.capability.ts` using `domain.capabilities<...>().methods(...)`.                                                 |
+| `feature-core-port`                     | `orchestration/ports/<kebab>.port.ts` — empty port interface scaffold; barrel updated.                                                                                            |
+| `feature-core-use-case`                 | `orchestration/use-cases/<kebab>.use-case.ts` — `create<Name>UseCase` factory; barrel updated.                                                                                    |
 
 ---
 
 ## Quick conventions
 
-- **File suffixes**: `.primitive.ts`, `.shape.ts`, `.primitive.refinement.ts`, `.shape.refinement.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
-- **xndrjs in core**: `feature-core` adds `zod`, `@xndrjs/branded` (`^0.1.0`), and `@xndrjs/orchestration` (`^0.1.0`) (use cases: `createUseCase` + anemic boundary). `driven-*` packages can add `data-layer` and `tasks` (`^0.1.0`) via their generator.
+- **File suffixes**: `.primitive.ts`, `.shape.ts`, `.proof.ts`, `.capability.ts`, `.service.ts`, `.port.ts`, `.use-case.ts`.
+- **xndrjs in core**: `feature-core` adds `zod` and `@xndrjs/domain-zod` (`^0.2.0`). Use cases and ports are plain TypeScript in `orchestration/` (no extra xndrjs runtime package). `driven-*` packages can add `@xndrjs/tasks` (`^0.2.0`) via their generator.
 - **Smoke test**: after `pnpm demo:scaffold`, inspect `features/demo/`; `pnpm demo:clear` removes it.

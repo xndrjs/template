@@ -8,7 +8,7 @@ function domainDir(repoRoot: string, corePackageRel: string) {
 /**
  * Repo-relative paths under `domain/` like `primitives/foo.primitive.ts`.
  */
-export function listBrandedPrimitiveRelativePaths(
+export function listPrimitiveRelativePaths(
   repoRoot: string,
   corePackageRel: string
 ): string[] {
@@ -20,13 +20,13 @@ export function listBrandedPrimitiveRelativePaths(
       (e) =>
         e.isFile() &&
         e.name.endsWith(".primitive.ts") &&
-        !e.name.endsWith(".primitive.refinement.ts")
+        !e.name.endsWith(".primitive.proof.ts")
     )
     .map((e) => `primitives/${e.name}`)
     .sort();
 }
 
-export function listBrandedShapeRelativePaths(
+export function listShapeRelativePaths(
   repoRoot: string,
   corePackageRel: string
 ): string[] {
@@ -38,29 +38,48 @@ export function listBrandedShapeRelativePaths(
       (e) =>
         e.isFile() &&
         e.name.endsWith(".shape.ts") &&
-        !e.name.endsWith(".shape.refinement.ts")
+        !e.name.endsWith(".shape.proof.ts")
     )
     .map((e) => `shapes/${e.name}`)
     .sort();
 }
 
-/** `export const Foo = branded.primitive(` → `Foo` */
+/** `export const Foo = domain.primitive(` or legacy `branded.primitive(` → `Foo` */
 export function parsePrimitiveKitId(source: string): string | null {
   const m = source.match(
-    /export\s+const\s+(\w+)\s*=\s*branded\.primitive\s*\(/u
+    /export\s+const\s+(\w+)\s*=\s*(?:domain|branded)\.primitive\s*\(/u
   );
   return m?.[1] ?? null;
 }
 
 /**
- * Shape kit id for refinements / prompts:
- * - `const [FooShape, patchFoo] = branded.shape(` (re-exported via `export { FooShape }`)
- * - legacy: `export const [FooShape, patchFoo] = branded.shape(`
+ * Shape kit id for proofs / prompts:
+ * - `export const FooShape = domain.shape(` (or `branded.shape(`)
+ * - `const FooShape = domain.shape(` (re-exported via `export { FooShape }`)
+ * - legacy tuple: `const [FooShape, patchFoo] = branded.shape(`
  * - fallback: `export { FooShape }` when tuple assignment is non-exported
  */
 export function parseShapeKitId(source: string): string | null {
+  const kitNs = "(?:domain|branded)";
+
+  const fromExportedConst = source.match(
+    new RegExp(
+      String.raw`export\s+const\s+(\w+)\s*=\s*${kitNs}\.shape\s*\(`,
+      "u"
+    )
+  );
+  if (fromExportedConst?.[1]) return fromExportedConst[1];
+
+  const fromConst = source.match(
+    new RegExp(String.raw`const\s+(\w+)\s*=\s*${kitNs}\.shape\s*\(`, "u")
+  );
+  if (fromConst?.[1]) return fromConst[1];
+
   const fromInternalTuple = source.match(
-    /const\s*\[\s*(\w+)\s*,\s*\w+\s*\]\s*=\s*branded\.shape\s*\(/u
+    new RegExp(
+      String.raw`const\s*\[\s*(\w+)\s*,\s*\w+\s*\]\s*=\s*${kitNs}\.shape\s*\(`,
+      "u"
+    )
   );
   if (fromInternalTuple?.[1]) return fromInternalTuple[1];
 
@@ -77,7 +96,7 @@ export function importModulePathFromDomainRel(domainRelPath: string): string {
 }
 
 /**
- * Same-folder import for a refinement module next to its base `*.primitive.ts` / `*.shape.ts`.
+ * Same-folder import for a proof module from its base `*.primitive.ts` / `*.shape.ts`.
  * `primitives/plop-demo-id.primitive.ts` → `./plop-demo-id.primitive`
  */
 export function sameDirectoryKitImportFromDomainRelPath(

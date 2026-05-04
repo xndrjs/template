@@ -10,19 +10,21 @@ import { toKebabCase, toPascalCase } from "../lib/casing.ts";
 
 const repoRoot = getRepoRoot();
 
-function stripTrailingServiceLabel(raw: string): string {
+function stripTrailingCapabilityLabel(raw: string): string {
   return raw
     .trim()
-    .replace(/\s+service\s*$/i, "")
+    .replace(/\s+capability\s*$/i, "")
     .trim()
-    .replace(/Service$/u, "")
+    .replace(/Capability$/u, "")
     .trim();
 }
 
-export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
-  plop.setGenerator("feature-core-service", {
+export default function registerFeatureCoreCapabilityGenerator(
+  plop: NodePlopAPI
+) {
+  plop.setGenerator("feature-core-capability", {
     description:
-      "Add a domain service under core/domain/operations/services/ (`<kebab>.service.ts`, default `<Name>Service` export); updates domain barrels.",
+      "Add a domain capability under core/domain/operations/capabilities/ (`<kebab>.capability.ts`, `<Name>Capability` export); updates domain barrels.",
     prompts: [
       {
         type: "list",
@@ -40,11 +42,11 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
       },
       {
         type: "input",
-        name: "serviceName",
+        name: "capabilityName",
         message:
-          "Service base name (e.g. PriceCalculator). File: domain/operations/services/<kebab>.service.ts, function: <Name>Service:",
+          "Capability base name (e.g. UserRename). File: domain/operations/capabilities/<kebab>.capability.ts, export: <Name>Capability:",
         validate: (value: unknown) => {
-          const base = stripTrailingServiceLabel(String(value ?? ""));
+          const base = stripTrailingCapabilityLabel(String(value ?? ""));
           if (!base) return "Name cannot be empty";
           const pascal = toPascalCase(base);
           if (!pascal) return "Could not derive a PascalCase name";
@@ -59,17 +61,19 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
         throw new Error("Select a core package.");
       }
 
-      const base = stripTrailingServiceLabel(String(data.serviceName ?? ""));
-      const pascalServiceName = toPascalCase(base);
+      const base = stripTrailingCapabilityLabel(
+        String(data.capabilityName ?? "")
+      );
+      const pascalCapabilityName = toPascalCase(base);
       const kebab = toKebabCase(base);
-      if (!pascalServiceName || !kebab) {
-        throw new Error("Invalid service name after normalization.");
+      if (!pascalCapabilityName || !kebab) {
+        throw new Error("Invalid capability name after normalization.");
       }
 
-      const exportLine = `export * from './${kebab}.service';`;
+      const exportLine = `export * from './${kebab}.capability';`;
       const operationsIndex = `../../${coreRel}/domain/operations/index.ts`;
-      const servicesIndex = `../../${coreRel}/domain/operations/services/index.ts`;
-      const serviceFile = `../../${coreRel}/domain/operations/services/${kebab}.service.ts`;
+      const capabilitiesIndex = `../../${coreRel}/domain/operations/capabilities/index.ts`;
+      const capabilityFile = `../../${coreRel}/domain/operations/capabilities/${kebab}.capability.ts`;
 
       return [
         {
@@ -119,27 +123,27 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
         },
         {
           type: "add",
-          path: "../../{{corePackageRel}}/domain/operations/capabilities/index.ts",
+          path: "../../{{corePackageRel}}/domain/operations/services/index.ts",
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: servicesIndex,
+          path: capabilitiesIndex,
           templateFile:
             "templates/feature-core/orchestration-slice-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "add",
-          path: serviceFile,
-          templateFile: "templates/feature-core/service.ts.hbs",
-          data: { pascalServiceName },
+          path: capabilityFile,
+          templateFile: "templates/feature-core/capability.ts.hbs",
+          data: { pascalCapabilityName },
         },
         {
           type: "modify",
-          path: servicesIndex,
+          path: capabilitiesIndex,
           transform: (file: string) =>
             appendExportToBarrelIndex(file, exportLine),
         },

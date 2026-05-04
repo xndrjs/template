@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { branded, BrandedType } from "@xndrjs/branded";
+import { domain, zodToValidator } from "@xndrjs/domain-zod";
 
 export const {{pascalName}}Schema = z.object({
   // Type discriminant for this shape. Remove it at your risk.
@@ -8,19 +8,9 @@ export const {{pascalName}}Schema = z.object({
   // payload: z.string().min(1),
 });
 
-const [{{pascalName}}Shape, patch{{pascalName}}] = branded.shape(
+export const {{pascalName}}Shape = domain.shape(
   "{{pascalName}}",
-  {{pascalName}}Schema,
-  {
-    methods: {
-      // use `this` to refer to the current {{pascalName}} instance:
-      // getPayloadLength() {
-      //   return this.payload.length;
-      // },
-    },
-  }
+  zodToValidator({{pascalName}}Schema)
 );
 
-export type {{pascalName}} = BrandedType<typeof {{pascalName}}Shape>;
-
-export { {{pascalName}}Shape };
+export type {{pascalName}} = ReturnType<typeof {{pascalName}}Shape["create"]>;

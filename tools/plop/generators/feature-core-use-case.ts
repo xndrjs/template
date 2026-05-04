@@ -21,17 +21,17 @@ function stripTrailingUseCaseLabel(raw: string): string {
 export default function registerFeatureCoreUseCaseGenerator(plop: NodePlopAPI) {
   plop.setGenerator("feature-core-use-case", {
     description:
-      "Add an orchestration use case under core/orchestration/use-cases/ (`<kebab>.use-case.ts`, `create<Name>UseCase` via `@xndrjs/orchestration`); updates the slice barrel.",
+      "Add an orchestration use case under core/orchestration/use-cases/ (`<kebab>.use-case.ts`, `create<Name>UseCase` factory); updates the slice barrel.",
     prompts: [
       {
         type: "list",
         name: "corePackageRel",
-        message: "Select @features/*-core package:",
+        message: "Select core package:",
         choices: () => {
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-core packages found. Run generator "feature-core" for your feature first.'
+              'No core packages found. Run generator "feature-core" for your feature first.'
             );
           }
           return c;

@@ -3,6 +3,7 @@ import path from "node:path";
 import type { NodePlopAPI } from "node-plop";
 import { getRepoRoot } from "../lib/repo-root.ts";
 import { toKebabCase } from "../lib/casing.ts";
+import { corePackageName } from "../lib/package-naming.ts";
 
 /** Paths in actions are relative to the plopfile directory (`tools/plop/`). */
 const TEMPLATE_PREFIX = "templates/feature-core";
@@ -20,12 +21,12 @@ function corePackageJsonPath(featureKebab: string): string {
 export default function registerFeatureCoreGenerator(plop: NodePlopAPI) {
   plop.setGenerator("feature-core", {
     description:
-      "Create features/<kebab>/core/ with @features/<kebab>-core (domain + orchestration entry barrels).",
+      "Create features/<kebab>/core/ package (domain models/operations + orchestration/use-cases and ports barrels).",
     prompts: [
       {
         type: "input",
         name: "featureName",
-        message: "Feature name (features/<kebab>/ and @features/<kebab>-core):",
+        message: "Feature name (features/<kebab>/ and @core/<kebab>):",
         validate: (value: unknown) => {
           const raw = String(value ?? "").trim();
           if (!raw) return "Feature name cannot be empty";
@@ -42,6 +43,7 @@ export default function registerFeatureCoreGenerator(plop: NodePlopAPI) {
     actions: (data) => {
       const k = toKebabCase(String(data?.featureName ?? ""));
       if (!k) return [];
+      const corePkgName = corePackageName(k);
 
       if (fs.existsSync(corePackageJsonPath(k))) {
         throw new Error(
@@ -54,6 +56,7 @@ export default function registerFeatureCoreGenerator(plop: NodePlopAPI) {
           type: "add",
           path: "../../features/{{kebabCase featureName}}/core/package.json",
           templateFile: `${TEMPLATE_PREFIX}/core-package.json.hbs`,
+          data: { corePackageName: corePkgName },
           skipIfExists: true,
         },
         {
@@ -64,26 +67,44 @@ export default function registerFeatureCoreGenerator(plop: NodePlopAPI) {
         },
         {
           type: "add",
-          path: "../../features/{{kebabCase featureName}}/core/domain/primitives/index.ts",
+          path: "../../features/{{kebabCase featureName}}/core/domain/models/primitives/index.ts",
           templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
           skipIfExists: true,
         },
         {
           type: "add",
-          path: "../../features/{{kebabCase featureName}}/core/domain/shapes/index.ts",
+          path: "../../features/{{kebabCase featureName}}/core/domain/models/shapes/index.ts",
           templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
           skipIfExists: true,
         },
         {
           type: "add",
-          path: "../../features/{{kebabCase featureName}}/core/domain/services/index.ts",
+          path: "../../features/{{kebabCase featureName}}/core/domain/models/proofs/index.ts",
           templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
           skipIfExists: true,
         },
         {
           type: "add",
-          path: "../../features/{{kebabCase featureName}}/core/domain/index.ts",
-          templateFile: `${TEMPLATE_PREFIX}/domain-index.ts.hbs`,
+          path: "../../features/{{kebabCase featureName}}/core/domain/models/index.ts",
+          templateFile: `${TEMPLATE_PREFIX}/domain-models-index.ts.hbs`,
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../features/{{kebabCase featureName}}/core/domain/operations/capabilities/index.ts",
+          templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../features/{{kebabCase featureName}}/core/domain/operations/services/index.ts",
+          templateFile: `${TEMPLATE_PREFIX}/orchestration-slice-index.ts.hbs`,
+          skipIfExists: true,
+        },
+        {
+          type: "add",
+          path: "../../features/{{kebabCase featureName}}/core/domain/operations/index.ts",
+          templateFile: `${TEMPLATE_PREFIX}/domain-operations-index.ts.hbs`,
           skipIfExists: true,
         },
         {

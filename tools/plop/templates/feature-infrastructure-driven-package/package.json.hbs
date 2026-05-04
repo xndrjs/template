@@ -1,5 +1,5 @@
 {
-  "name": "@features/{{featureKebab}}-infra-driven-{{drivenKebab}}",
+  "name": "{{infrastructurePackageName}}",
   "version": "1.0.0",
   "description": "Driven outbound adapters (driven-{{drivenKebab}}): flat TypeScript modules at package root, re-exported from index.ts.",
   "private": true,
@@ -12,17 +12,11 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run"
   },
-{{#if hasOptionalXndrDeps}}
   "dependencies": {
-{{#if includeDataLayer}}
-    "@xndrjs/data-layer": "{{workspaceDependencyVersion "@xndrjs/data-layer"}}"{{#if includeTasks}},
-{{/if}}
-{{/if}}
-{{#if includeTasks}}
+    "{{corePackageName}}": "workspace:*"{{#if includeTasks}},
     "@xndrjs/tasks": "{{workspaceDependencyVersion "@xndrjs/tasks"}}"
 {{/if}}
   },
-{{/if}}
   "devDependencies": {
     "vitest": "{{workspaceDependencyVersion "vitest"}}"
   }

@@ -10,24 +10,17 @@ import { toKebabCase, toPascalCase } from "../lib/casing.ts";
 
 const repoRoot = getRepoRoot();
 
-function stripTrailingServiceLabel(raw: string): string {
-  return raw
-    .trim()
-    .replace(/\s+service\s*$/i, "")
-    .trim()
-    .replace(/Service$/u, "")
-    .trim();
-}
-
-export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
-  plop.setGenerator("feature-core-service", {
+export default function registerFeatureCoreDomainShapeGenerator(
+  plop: NodePlopAPI
+) {
+  plop.setGenerator("feature-core-domain-shape", {
     description:
-      "Add a domain service under core/domain/operations/services/ (`<kebab>.service.ts`, default `<Name>Service` export); updates domain barrels.",
+      "Add a Zod + @xndrjs/domain-zod shape under core/domain/models/shapes/ (`<kebab>.shape.ts`); exports `const <Name>Shape = domain.shape(...)` — see https://www.npmjs.com/package/@xndrjs/domain-zod",
     prompts: [
       {
         type: "list",
         name: "corePackageRel",
-        message: "Select core package (feature):",
+        message: "Select core package:",
         choices: () => {
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
@@ -40,50 +33,21 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
       },
       {
         type: "input",
-        name: "serviceName",
+        name: "shapeName",
         message:
-          "Service base name (e.g. PriceCalculator). File: domain/operations/services/<kebab>.service.ts, function: <Name>Service:",
-        validate: (value: unknown) => {
-          const base = stripTrailingServiceLabel(String(value ?? ""));
-          if (!base) return "Name cannot be empty";
-          const pascal = toPascalCase(base);
-          if (!pascal) return "Could not derive a PascalCase name";
-          return true;
-        },
+          "Domain shape base name (e.g. AddressSnapshot). File will be `domain/models/shapes/<kebab>.shape.ts`:",
+        validate: (value: unknown) =>
+          String(value ?? "").trim().length > 0 || "Name cannot be empty",
       },
     ],
     actions: (data?: Record<string, unknown>): ActionType[] => {
       if (!data) return [];
-      const coreRel = String(data.corePackageRel ?? "").trim();
-      if (!coreRel) {
-        throw new Error("Select a core package.");
-      }
-
-      const base = stripTrailingServiceLabel(String(data.serviceName ?? ""));
-      const pascalServiceName = toPascalCase(base);
+      const base = String(data.shapeName ?? "").trim();
+      const pascalName = toPascalCase(base);
       const kebab = toKebabCase(base);
-      if (!pascalServiceName || !kebab) {
-        throw new Error("Invalid service name after normalization.");
-      }
-
-      const exportLine = `export * from './${kebab}.service';`;
-      const operationsIndex = `../../${coreRel}/domain/operations/index.ts`;
-      const servicesIndex = `../../${coreRel}/domain/operations/services/index.ts`;
-      const serviceFile = `../../${coreRel}/domain/operations/services/${kebab}.service.ts`;
+      const exportLine = `export * from './${kebab}.shape';`;
 
       return [
-        {
-          type: "add",
-          path: "../../{{corePackageRel}}/domain/models/index.ts",
-          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
-          skipIfExists: true,
-        },
-        {
-          type: "modify",
-          path: "../../{{corePackageRel}}/domain/models/index.ts",
-          transform: (file: string) =>
-            ensureModelsIndexReexportsModelSlices(file),
-        },
         {
           type: "add",
           path: "../../{{corePackageRel}}/domain/models/primitives/index.ts",
@@ -107,15 +71,34 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
         },
         {
           type: "add",
-          path: operationsIndex,
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          templateFile: "templates/feature-core/domain-models-index.ts.hbs",
+          skipIfExists: true,
+        },
+        {
+          type: "modify",
+          path: "../../{{corePackageRel}}/domain/models/index.ts",
+          transform: (file: string) =>
+            ensureModelsIndexReexportsModelSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/index.ts",
           templateFile: "templates/feature-core/domain-operations-index.ts.hbs",
           skipIfExists: true,
         },
         {
           type: "modify",
-          path: operationsIndex,
+          path: "../../{{corePackageRel}}/domain/operations/index.ts",
           transform: (file: string) =>
             ensureOperationsIndexReexportsOperationSlices(file),
+        },
+        {
+          type: "add",
+          path: "../../{{corePackageRel}}/domain/operations/services/index.ts",
+          templateFile:
+            "templates/feature-core/orchestration-slice-index.ts.hbs",
+          skipIfExists: true,
         },
         {
           type: "add",
@@ -126,20 +109,13 @@ export default function registerFeatureCoreServiceGenerator(plop: NodePlopAPI) {
         },
         {
           type: "add",
-          path: servicesIndex,
-          templateFile:
-            "templates/feature-core/orchestration-slice-index.ts.hbs",
-          skipIfExists: true,
-        },
-        {
-          type: "add",
-          path: serviceFile,
-          templateFile: "templates/feature-core/service.ts.hbs",
-          data: { pascalServiceName },
+          path: "../../{{corePackageRel}}/domain/models/shapes/{{kebabCase shapeName}}.shape.ts",
+          templateFile: "templates/feature-core/shape.ts.hbs",
+          data: { pascalName },
         },
         {
           type: "modify",
-          path: servicesIndex,
+          path: "../../{{corePackageRel}}/domain/models/shapes/index.ts",
           transform: (file: string) =>
             appendExportToBarrelIndex(file, exportLine),
         },

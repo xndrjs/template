@@ -30,7 +30,7 @@ export function getDemoWebRoot(ctx: RequestContext) {
 describe("wireUseCasesIntoCompositionIndex", () => {
   it("handles Prettier-style empty return {}", () => {
     const out = wireUseCasesIntoCompositionIndex(scaffoldPrettierReturn, [
-      { corePkgName: "@features/demo-core", kebabStem: "verify-user" },
+      { corePkgName: "@core/demo", kebabStem: "verify-user" },
     ]);
     expect(out).toContain("verifyUser: createVerifyUserUseCase({}),");
     expect(out).toMatch(/return \{[^}]*verifyUser/s);
@@ -38,30 +38,30 @@ describe("wireUseCasesIntoCompositionIndex", () => {
 
   it("adds imports and return entries for use cases", () => {
     const out = wireUseCasesIntoCompositionIndex(scaffold, [
-      { corePkgName: "@features/demo-core", kebabStem: "verify-user" },
+      { corePkgName: "@core/demo", kebabStem: "verify-user" },
     ]);
     expect(out).toContain(
-      'import { createVerifyUserUseCase } from "@features/demo-core/use-cases";'
+      'import { createVerifyUserUseCase } from "@core/demo/use-cases";'
     );
     expect(out).toContain("verifyUser: createVerifyUserUseCase({}),");
   });
 
   it("is idempotent for the same wire", () => {
     const once = wireUseCasesIntoCompositionIndex(scaffold, [
-      { corePkgName: "@features/demo-core", kebabStem: "verify-user" },
+      { corePkgName: "@core/demo", kebabStem: "verify-user" },
     ]);
     const twice = wireUseCasesIntoCompositionIndex(once, [
-      { corePkgName: "@features/demo-core", kebabStem: "verify-user" },
+      { corePkgName: "@core/demo", kebabStem: "verify-user" },
     ]);
     expect(twice).toBe(once);
   });
 
   it("appends a second use case after the first", () => {
     const once = wireUseCasesIntoCompositionIndex(scaffold, [
-      { corePkgName: "@features/demo-core", kebabStem: "verify-user" },
+      { corePkgName: "@core/demo", kebabStem: "verify-user" },
     ]);
     const twice = wireUseCasesIntoCompositionIndex(once, [
-      { corePkgName: "@features/demo-core", kebabStem: "create-order" },
+      { corePkgName: "@core/demo", kebabStem: "create-order" },
     ]);
     expect(twice).toContain("createOrder: createCreateOrderUseCase({}),");
   });

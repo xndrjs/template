@@ -34,10 +34,10 @@ const infrastructureProvider = new {{pascalProvider}}InfrastructureProvider();
 
 /**
  * Wired use cases for this feature composition app. Add **factories** (or getters) here that return
- * `createXyzUseCase({ … })(…)` (from `@xndrjs/orchestration`), pulling deps from
+ * `createXyzUseCase({ … })` results, pulling deps from
  * `infrastructureProvider.getForContext(ctx)` (only normal ports belong on those deps objects).
  *
- * **Interactive use cases:** same `createUseCase` shape in core/orchestration; callers pass `…InteractionPort`
+ * **Interactive use cases:** same two-step shape in core/orchestration; callers pass `…InteractionPort`
  * into the inner `execute` at call sites — do not put interaction ports on the deps object.
  *
  * Example shape:

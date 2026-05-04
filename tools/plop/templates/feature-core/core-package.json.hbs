@@ -1,12 +1,12 @@
 {
-  "name": "@features/{{kebabCase featureName}}-core",
+  "name": "{{corePackageName}}",
   "version": "1.0.0",
-  "description": "Core (domain + orchestration) for feature {{pascalCase featureName}}",
+  "description": "Core for feature {{pascalCase featureName}}: domain models, operations, use cases, and ports",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts",
-    "./domain": "./domain/index.ts",
+    "./models": "./domain/models/index.ts",
+    "./operations": "./domain/operations/index.ts",
     "./use-cases": "./orchestration/use-cases/index.ts",
     "./ports": "./orchestration/ports/index.ts"
   },
@@ -16,8 +16,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@xndrjs/branded": "{{workspaceDependencyVersion "@xndrjs/branded"}}",
-    "@xndrjs/orchestration": "{{workspaceDependencyVersion "@xndrjs/orchestration"}}",
+    "@xndrjs/domain-zod": "{{workspaceDependencyVersion "@xndrjs/domain-zod"}}",
     "zod": "{{workspaceDependencyVersion "zod"}}"
   },
   "devDependencies": {

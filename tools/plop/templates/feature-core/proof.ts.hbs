@@ -1,0 +1,23 @@
+import type { ProofValue } from "@xndrjs/domain-zod";
+import { domain, zodToValidator } from "@xndrjs/domain-zod";
+import { z } from "zod";
+
+/**
+ * Schema-first proof `{{proofPascal}}`.
+ * Define a specific schema or import an existing schema.
+ */
+const {{proofPascal}}Schema = z.object({
+  // TODO example, remove this
+  // someProperty: z.literal(true),
+});
+
+export const {{proofPascal}}Proof = domain
+  .proof("{{proofPascal}}", zodToValidator({{proofPascal}}Schema))
+  // you can refine the output type like this, if needed:
+  // .refineType((row): row is typeof row & { someProperty: true } => row.someProperty === true);
+
+/** After `.refineType`, narrow this alias manually if needed. */
+export type {{proofPascal}} = ProofValue<
+  "{{proofPascal}}",
+  z.infer<typeof {{proofPascal}}Schema>
+>;

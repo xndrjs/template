@@ -8,10 +8,10 @@ importers:
 
   .:
     devDependencies:
-      '@features/config-eslint':
+      '@config/eslint':
         specifier: workspace:^
         version: link:configs/config-eslint
-      '@features/config-vitest':
+      '@config/vitest':
         specifier: workspace:^
         version: link:configs/config-vitest
       '@types/node':
@@ -20,12 +20,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.1.0
         version: 4.1.4(vitest@4.1.4)
-      '@xndrjs/branded':
-        specifier: ^0.1.0
-        version: 0.1.0
-      '@xndrjs/orchestration':
-        specifier: ^0.1.0
-        version: 0.1.0
+      '@xndrjs/domain-zod':
+        specifier: ^0.2.0
+        version: 0.2.0(zod@4.3.6)
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.4)
@@ -697,11 +694,15 @@ packages:
   '@vitest/utils@4.1.4':
     resolution: {integrity: sha512-13QMT+eysM5uVGa1rG4kegGYNp6cnQcsTc67ELFbhNLQO+vgsygtYJx2khvdt4gVQqSSpC/KT5FZZxUpP3Oatw==}
 
-  '@xndrjs/branded@0.1.0':
-    resolution: {integrity: sha512-4j1w0u8B5KcCdt07xGZuoUlVdjNowRpYTD6DF7dYg58rl4bCIHz3AaZB/OiFwk2bmj3QHrzSvlcs0AQvKc1NDQ==}
+  '@xndrjs/domain-zod@0.2.0':
+    resolution: {integrity: sha512-9eLEzzgwCwn9FI0q0lRBkjqwsyVihgYDFlOGZ8XefHnjUFnvZVvcviCG+tI8aau/HD0+kbv0/Odo1yEY1qC7BQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^4.0.0
 
-  '@xndrjs/orchestration@0.1.0':
-    resolution: {integrity: sha512-bgbn8VBwcDxvfL1fksM/RHDD/DsIxe9zLXuIPWZyUxQGjWtM96ENBMPhV1hSTL+/PC0IZbZLAo7I5T7II7BRwg==}
+  '@xndrjs/domain@0.2.0':
+    resolution: {integrity: sha512-Xut7HhP2ocAEvbWtfArdZU3LVTMJBv0cms2cIWmHko/jQZr+PMqTClC1lRDiSca84xbaa5x5b+YjgvlgYssd8A==}
+    engines: {node: '>=18'}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2431,13 +2432,12 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
-  '@xndrjs/branded@0.1.0':
+  '@xndrjs/domain-zod@0.2.0(zod@4.3.6)':
     dependencies:
+      '@xndrjs/domain': 0.2.0
       zod: 4.3.6
 
-  '@xndrjs/orchestration@0.1.0':
-    dependencies:
-      '@xndrjs/branded': 0.1.0
+  '@xndrjs/domain@0.2.0': {}
 
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:

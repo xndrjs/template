@@ -1,0 +1,18 @@
+import { domain } from "@xndrjs/domain-zod";
+
+export interface {{pascalCapabilityName}}CapabilityBase {
+  // add the properties on which this capability shall operate, i.e.
+  // displayName: string
+}
+
+export const {{pascalCapabilityName}}Capability = domain
+  .capabilities<{{pascalCapabilityName}}CapabilityBase>()
+  .methods((_patch) => ({
+    // TODO add methods
+    // keep shape as the first parameter, type is automatically inferred
+    /* 
+    rename(shape, displayName: string) {
+      return patch(shape, { displayName });
+    },
+    */
+  }));

@@ -4,10 +4,8 @@ import path from "node:path";
 const FALLBACK_DEPENDENCY_VERSIONS: Record<string, string> = {
   vitest: "^4.1.0",
   zod: "^4.3.6",
-  "@xndrjs/branded": "^0.1.0",
-  "@xndrjs/orchestration": "^0.1.0",
-  "@xndrjs/data-layer": "^0.1.0",
-  "@xndrjs/tasks": "^0.1.0",
+  "@xndrjs/domain-zod": "^0.2.0",
+  "@xndrjs/tasks": "^0.2.0",
 };
 
 function parseSemverLike(spec: string | undefined | null) {
@@ -39,12 +37,7 @@ function compareVersionSpecs(
 function collectPackageJsonPaths(absDir: string, out: string[]) {
   if (!fs.existsSync(absDir)) return;
   for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
-    if (
-      entry.name === "node_modules" ||
-      entry.name === ".git" ||
-      entry.name === ".cursor"
-    )
-      continue;
+    if (entry.name === "node_modules" || entry.name.startsWith(".")) continue;
     const full = path.join(absDir, entry.name);
     if (entry.isDirectory()) {
       collectPackageJsonPaths(full, out);

@@ -1,5 +1,5 @@
 {
-  "name": "@features/config-eslint",
+  "name": "@config/eslint",
   "version": "1.0.0",
   "private": true,
   "description": "Shared ESLint flat config for the monorepo",

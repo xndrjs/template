@@ -5,14 +5,13 @@ import { featureSegmentFromCorePackageRel } from "../lib/repo-core-paths.ts";
 import { getRepoCorePackageChoices } from "../lib/repo-core-packages.ts";
 import { getRepoRoot } from "../lib/repo-root.ts";
 import { toKebabCase } from "../lib/casing.ts";
+import {
+  corePackageName,
+  infrastructureDrivenPackageName,
+} from "../lib/package-naming.ts";
 const repoRoot = getRepoRoot();
 
 const XNDR_INFRA_DRIVEN_PACKAGE_CHOICES = [
-  {
-    name: "@xndrjs/data-layer — Data layer utilities: batch loaders, registry, mapping helpers.",
-    value: "@xndrjs/data-layer",
-    checked: true,
-  },
   {
     name: "@xndrjs/tasks — Lazy async tasks utilities.",
     value: "@xndrjs/tasks",
@@ -33,17 +32,17 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
 ) {
   plop.setGenerator("feature-infrastructure-driven-package", {
     description:
-      "Create @features/…-infra-driven-… under features/<feature>/infrastructure/driven-<name>/ (flat TypeScript modules at package root, re-exported from index.ts).",
+      "Create driven- infrastructure package under features/<feature>/infrastructure/driven-<name>/ (flat TypeScript modules at package root, re-exported from index.ts).",
     prompts: [
       {
         type: "list",
         name: "corePackageRel",
-        message: "Select @features/*-core (determines features/<slug>/):",
+        message: "Select core package (determines features/<slug>/):",
         choices: () => {
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-core packages found. Run generator "feature-core" for your feature first.'
+              'No core packages found. Run generator "feature-core" for your feature first.'
             );
           }
           return c;
@@ -78,7 +77,7 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
       {
         type: "checkbox",
         name: "xndrInfraDrivenPackages",
-        message: "Optional @xndrjs packages to install in this driven package:",
+        message: "Optional @xndrjs/tasks dependency for this driven package:",
         choices: [...XNDR_INFRA_DRIVEN_PACKAGE_CHOICES],
       },
     ],
@@ -97,6 +96,11 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
       }
 
       const featureKebab = featureSegmentFromCorePackageRel(coreRel);
+      const corePkgName = corePackageName(featureKebab);
+      const infrastructurePkgName = infrastructureDrivenPackageName(
+        featureKebab,
+        drivenKebab
+      );
 
       const packageRel = `features/${featureKebab}/infrastructure/driven-${drivenKebab}`;
       const packageRootAbs = path.join(repoRoot, ...packageRel.split("/"));
@@ -111,15 +115,13 @@ export default function registerFeatureInfrastructureDrivenPackageGenerator(
         ? (rawSelected as string[]).filter((p) => typeof p === "string")
         : [...DEFAULT_XNDR_INFRA_DRIVEN_PACKAGES];
 
-      const includeDataLayer = selected.includes("@xndrjs/data-layer");
       const includeTasks = selected.includes("@xndrjs/tasks");
-      const hasOptionalXndrDeps = includeDataLayer || includeTasks;
 
       const templateData = {
         featureKebab,
         drivenKebab,
-        hasOptionalXndrDeps,
-        includeDataLayer,
+        corePackageName: corePkgName,
+        infrastructurePackageName: infrastructurePkgName,
         includeTasks,
       };
 

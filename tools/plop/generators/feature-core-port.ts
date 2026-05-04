@@ -23,12 +23,12 @@ export default function registerFeatureCorePortGenerator(plop: NodePlopAPI) {
       {
         type: "list",
         name: "corePackageRel",
-        message: "Select @features/*-core package:",
+        message: "Select core package:",
         choices: () => {
           const c = getRepoCorePackageChoices(repoRoot);
           if (!c.length) {
             throw new Error(
-              'No @features/*-core packages found. Run generator "feature-core" for your feature first.'
+              'No core packages found. Run generator "feature-core" for your feature first.'
             );
           }
           return c;
